@@ -1,4 +1,6 @@
-﻿
+0000000074000000000200000000240000000024hallo welt.txt00000000200000001600Global.slnteststeingd sa d
+
+ds a﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.539
@@ -6,8 +8,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XOR Enc", "XOR Enc\XOR Enc.csproj", "{6475A361-E814-4E63-908C-9FA16363A13B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "container", "container\container.csproj", "{470F76B6-EA81-44DB-AA02-A0D864F9F68A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Software", "Software\Software.csproj", "{CBFC0B9D-D8B6-4546-85FE-795E065FB22A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		{470F76B6-EA81-44DB-AA02-A0D864F9F68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{470F76B6-EA81-44DB-AA02-A0D864F9F68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{470F76B6-EA81-44DB-AA02-A0D864F9F68A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CBFC0B9D-D8B6-4546-85FE-795E065FB22A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBFC0B9D-D8B6-4546-85FE-795E065FB22A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CBFC0B9D-D8B6-4546-85FE-795E065FB22A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBFC0B9D-D8B6-4546-85FE-795E065FB22A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

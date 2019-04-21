@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6475A361-E814-4E63-908C-9FA16363A13B}</ProjectGuid>
+    <ProjectGuid>{470F76B6-EA81-44DB-AA02-A0D864F9F68A}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>XOR_Enc</RootNamespace>
-    <AssemblyName>XOR Enc</AssemblyName>
+    <RootNamespace>container</RootNamespace>
+    <AssemblyName>container</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="utils\Class1.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
