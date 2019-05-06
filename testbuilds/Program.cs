@@ -2,11 +2,16 @@
 using System.Ai;
 using System.Ai.Modle;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Ftp;
+using System.ImageScan;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Utils;
+using System.Windows.Forms;
 using testbuilds.TestUtils;
 
 namespace testbuilds {
@@ -14,8 +19,9 @@ namespace testbuilds {
         static void Main(string[] args) {
             _Ftp f = new _Ftp();
             _Ai a = new _Ai();
+            _Imagescan i = new _Imagescan( "..\\..\\..\\example.png" );
 
-            Utils.SetupChoise( new ChoisObjekts[] { f, a } );
+            Utils.SetupChoise( new ChoisObjekts[] { f, a, i } );
 
             Console.WriteLine( "Press any Key t Exit..." );
             Console.ReadLine();
@@ -72,6 +78,41 @@ namespace testbuilds {
             Console.WriteLine( "\ndone in " + ( DateTime.Now - t ) );
             t = DateTime.Now;
             Console.WriteLine( "---------------FINISHED---------------" );
+        }
+    }
+
+    public class _Imagescan : ChoisObjekts {
+        private string ptb;
+        public _Imagescan(string PathToBitmap) : base( "ImageScan Tests" ) {
+            ptb = PathToBitmap;
+        }
+        public override void Avtivete() {
+            base.Avtivete();
+            Scan();
+        }
+
+        private void Scan() {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault( true );
+
+
+            string Path_to_Bmp = ptb;
+
+            ImageScan IC = new ImageScan();
+
+            bool result;
+            Point point;
+            TimeSpan TS;
+            int Tolleranz = 50;
+            ImageScan.ImageScanMethode Ism = ImageScan.ImageScanMethode.Fast;
+            Console.WriteLine( Path.GetDirectoryName( Path_to_Bmp ) );
+            var b = new Bitmap( Path_to_Bmp );
+
+            while (true) {
+                var str = IC.SertchImageWithInfo( IC.CaptureScreen(), b, out result, out point, out TS, Ism, Tolleranz );
+                Console.WriteLine( str );
+                Thread.Sleep( 250 );
+            }
         }
     }
 

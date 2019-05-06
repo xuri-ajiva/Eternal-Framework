@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{29E23302-26C2-42B4-8FA7-E4249E950D6B}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>testbuilds</RootNamespace>
-    <AssemblyName>testbuilds</AssemblyName>
+    <ProjectGuid>{7BF544E9-672C-4154-BDE4-62E3A085B5DE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>System.ImageScan</RootNamespace>
+    <AssemblyName>System.ImageScan</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -47,28 +45,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestUtils\Utils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\System.Ai\System.Ai.csproj">
-      <Project>{def2e53c-3bc3-4d1a-a90d-61dd1fe934e1}</Project>
-      <Name>System.Ai</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.Ftp\System.Ftp.csproj">
-      <Project>{9ec7ba5e-c614-4902-a116-d87ad267a0e8}</Project>
-      <Name>System.Ftp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.ImageScan\System.ImageScan.csproj">
-      <Project>{7bf544e9-672c-4154-bde4-62e3a085b5de}</Project>
-      <Name>System.ImageScan</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.Utils\System.Utils.csproj">
-      <Project>{cc865eab-49d9-49e5-b439-1d48169353fe}</Project>
-      <Name>System.Utils</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
