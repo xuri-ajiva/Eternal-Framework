@@ -69,5 +69,18 @@ namespace System.Utils {
             //    Console.WriteLine( "vailet" );
             return rlDaten;
         }
+        public static string Fullsize(string daten) {
+            string result = "";
+            int length = (int) daten.Length;
+
+            for (int i = length.ToString().Length; i < 5; i++) {
+                result += "0";
+            }
+
+            result += length.ToString();
+
+            result += daten;
+            return result;
+        }
     }
 }

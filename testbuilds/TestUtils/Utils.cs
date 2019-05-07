@@ -17,14 +17,17 @@ namespace testbuilds.TestUtils {
     public class ChoisObjekts {
         public Guid guid { get; private set; }
         public string _Name { get; private set; }
+        public Action _YourVoid { get; private set; }
 
-        public ChoisObjekts(string Name) {
+        public ChoisObjekts(string Name, Action YourVoid) {
             guid = Guid.NewGuid();
             _Name = Name;
+            _YourVoid = YourVoid;
         }
 
-        public virtual void Avtivete() {
+        public void Avtivete() {
             Console.WriteLine( "Choised: " + _Name );
+            _YourVoid();
         }
 
         public bool Equals(ChoisObjekts c1, ChoisObjekts c2) {

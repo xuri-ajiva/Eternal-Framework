@@ -20,30 +20,31 @@ namespace System.Ai {
             m.init = true;
             return m;
         }
-        public void trainloop(MInt64 m) {
+        public void trainloop(MInt64 m, long oSetMin, long oSetMax, bool output = true) {
             ts = DateTime.Now;
-            while (!Train( m )) {
+            while (!Train( m, oSetMin, oSetMax, output )) {
 
             }
         }
 
-        public bool Train(MInt64 m) {
-            if (m.longs) {
+        public bool Train(MInt64 m, long oSetMin, long oSetMax, bool output = true) {
+            if (m.doubs) {
                 if (m.w == 0) {
                     if (m.addition) {
-                        m.w = 1;
+                        m.w = oSetMin;
                     } else {
-                        m.w = -1;
+                        m.w = -oSetMin;
                     }
                 }
 
-                double prev = m.Variable;
+                long prev = (long) m.Variable;
 
                 m.Longs[m.currentIndex] += m.w;
                 m.algo.OnMainInt64( m );
-                if (m.Variable > m.Ziehl && m.Variable < prev) { } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
+
+                if (m.Variable > m.Ziehl && m.Variable < prev) { m.addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
                     m.addition = !m.addition;
-                } else if (m.Variable < m.Ziehl && m.Variable > prev) { }
+                } else if (m.Variable < m.Ziehl && m.Variable > prev) { m.addition = true; }
                 m.w = 0;
 
                 if (m.Variable < m.Ziehl + m.tolleranz && m.Variable > m.Ziehl - m.tolleranz) {
@@ -51,10 +52,10 @@ namespace System.Ai {
                     return true;
                 }
                 if (prev == m.Variable) {
-                    m.w += m.addition ? 1 : -1;
+                    m.w += m.addition ? oSetMax : -oSetMin;
                 }
-
-                Console.WriteLine( $"ONext:{m.w}, prew:{prev}, post:{m.Variable}, tolleranz:{m.tolleranz}" );
+                if (output)
+                    Console.WriteLine( $"ONext:{m.w}, prew:{prev}, post:{m.Variable}, tolleranz:{m.tolleranz}" );
                 m.round += 1;
             }
             if (m.round == 10) {
@@ -72,8 +73,8 @@ namespace System.Ai {
 
         private void Finished(MInt64 m) {
             Console.Write( "Finished in " + ( DateTime.Now - ts ) + $" Final Vaule:{m.Variable}, FInal Longs:" );
-            for (int i = 0; i < m.Longs.Length; i++) {
-                Console.Write( $"long[{i}]: {m.Longs[i]}, " );
+            for (int i = 0; i < m.length; i++) {
+                Console.Write( $"doubs[{i}]: {m.Doubles[i]}, " );
             }
             Console.WriteLine();
         }
@@ -90,27 +91,27 @@ namespace System.Ai {
             m.init = true;
             return m;
         }
-        public void trainloop(MDouble m) {
+        public void trainloop(MDouble m, double oSetMin, double oSetMax, bool output = true) {
             ts = DateTime.Now;
-            while (!Train( m )) {
+            while (!Train( m, oSetMin, oSetMax, output )) {
 
             }
         }
 
-        public bool Train(MDouble m) {
+        public bool Train(MDouble m, double oSetMin, double oSetMax, bool output = true) {
             if (m.doubs) {
                 if (m.w == 0) {
                     if (m.addition) {
-                        m.w = 0.1;
+                        m.w = oSetMin;
                     } else {
-                        m.w = -0.1;
+                        m.w = -oSetMin;
                     }
                 }
 
                 double prev = m.Variable;
 
                 m.Doubles[m.currentIndex] += m.w;
-                m.algo.OnMainDouble( m );
+                m.algo( m, output );
 
                 if (m.Variable > m.Ziehl && m.Variable < prev) { m.addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
                     m.addition = !m.addition;
@@ -122,10 +123,10 @@ namespace System.Ai {
                     return true;
                 }
                 if (prev == m.Variable) {
-                    m.w += m.addition ? 0.2 : -0.2;
+                    m.w += m.addition ? oSetMax : -oSetMin;
                 }
-
-                Console.WriteLine( $"ONext:{m.w}, prew:{prev}, post:{m.Variable}, tolleranz:{m.tolleranz}" );
+                if (output)
+                    Console.WriteLine( $"ONext:{m.w}, prew:{prev}, post:{m.Variable}, tolleranz:{m.tolleranz}" );
                 m.round += 1;
             }
             if (m.round == 10) {
@@ -146,7 +147,7 @@ namespace System.Ai {
             for (int i = 0; i < m.length; i++) {
                 Console.Write( $"doubs[{i}]: {m.Doubles[i]}, " );
             }
-            Console.WriteLine();
+            Console.WriteLine( "      " );
         }
     }
 }
@@ -154,8 +155,8 @@ namespace System.Ai {
 namespace System.Ai.Modle {
 
     public class MInt64 : Base {
-        public int w = 0;
-        public int length { get; private set; }
+        public long w = 0;
+        public long length { get; private set; }
 
         private long _Vaule = -1;
         public long Vaule { get { if (!isOnVaule) { return _Vaule; } else { return -1; } } private set => _Vaule = value; }
@@ -191,13 +192,13 @@ namespace System.Ai.Modle {
         public bool isOnVaule { get; private set; }
 
         public int currentIndex { get; set; }
-        public Algos algo;
+        public Action<MDouble, bool> algo;
         public bool addition = true;
         public int round = 0;
 
         public double tolleranz = 0;
 
-        public MDouble(int Ziehlwert, int startwert, double[] _doubs, Algos algos, double _tolleranz = 0) : base( Ziehlwert, startwert, null, _doubs, null, null ) {
+        public MDouble(int Ziehlwert, int startwert, double[] _doubs, Action<MDouble, bool> algos, double _tolleranz = 0) : base( Ziehlwert, startwert, null, _doubs, null, null ) {
             tolleranz = _tolleranz;
             algo = algos;
 
@@ -221,10 +222,12 @@ namespace System.Ai.Modle {
         public int[] Integers;
         private double[] Doubles_;
 
-        public double[] Doubles { get => Doubles_;
+        public double[] Doubles {
+            get => Doubles_;
             set =>
                 //Console.WriteLine("             set             ");
-                Doubles_ = value; }
+                Doubles_ = value;
+        }
 
         public string[] Strings;
         public long[] Longs;
