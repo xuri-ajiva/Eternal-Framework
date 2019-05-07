@@ -20,13 +20,15 @@ namespace testbuilds {
         public static void Main(string[] args) {
             var p = new Program();
         }
+
         public Program() {
             ChoisObjekts ftp = new ChoisObjekts( "FtpTest", _Ftp );
             ChoisObjekts ims = new ChoisObjekts( "ImageScanTest", _ImageScan );
             ChoisObjekts ai = new ChoisObjekts( "AiTest", _Ai );
             ChoisObjekts task = new ChoisObjekts( "Testtest With Ftp", _Task );
+            ChoisObjekts taskingo = new ChoisObjekts( "TaskInfoTests", _TaskInfo );
 
-            Utils.SetupChoise( new ChoisObjekts[] { ftp, task, ai, ims } );
+            Utils.SetupChoise( new ChoisObjekts[] { ftp, task, taskingo, ai, ims } );
             Console.WriteLine( "\n" );
             Console.WriteLine( "Press any Key to Exit!" );
             Console.ReadKey();
@@ -36,35 +38,67 @@ namespace testbuilds {
         }
 
         #region TaskTrack
+        TaskInfo ti;
         TaskInfo.State _State = TaskInfo.State.None;
-        private void _Task() {
-            TaskInfo t = new TaskInfo( " ", _Ftp );
+        public void _TaskInfo() {
+            ti = new TaskInfo( "testtask", Tasktest );
+            ti.Run();
+        }
+        public void Tasktest() {
+            while (true) {
+                ti._State = TaskInfo.State.critical;
+                Thread.Sleep( 1000 );
 
-            Thread update = new Thread( () => {
-                while (true) {
-                    t._State = _State;
-                    t._Name = ftpMessage;
-                }
-            } );
-            update.Start();
-            t.Run();
+                ti._State = TaskInfo.State.error;
+                Thread.Sleep( 2000 );
+
+                ti._State = TaskInfo.State.fail;
+                Thread.Sleep( 2000 );
+
+                ti._State = TaskInfo.State.None;
+                Thread.Sleep( 2000 );
+
+                ti._State = TaskInfo.State.ok;
+                Thread.Sleep( 2000 );
+
+                ti._State = TaskInfo.State.running;
+                Thread.Sleep( 4000 );
+
+                ti._State = TaskInfo.State.warning;
+                Thread.Sleep( 2000 );
+            }
+        }
+        private void _Task() {
+            ti = new TaskInfo( " ", _Ftp );
+            ti.Run();
         }
         #endregion
 
         #region FtpTest
-        public string ftpMessage = "";
+        FtpClinet ftp;
         private void _Ftp() {
             var filename = "Roaming.rar";
             _State = TaskInfo.State.running;
             try {
-                FtpClinet ftp = new FtpClinet( "ftp://127.0.0.1/" + filename, "test", Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) ), filename, (int) Math.Pow( 2, 26 ) );
-                Thread up = new Thread( () => { while (true) { ftpMessage = ftp._message; } } );
+                ftp = new FtpClinet( "ftp://127.0.0.1/" + filename, "test", Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) ), filename, (int) Math.Pow( 2, 26 ) );
+                Console.Write("\n  ");
+                Thread up = new Thread( () => {
+                    while (true) {
+                        if (ti != null) {
+                            ti._State = _State;
+                            ti._Name = ftp._message;
+                        } else {
+                            Console.SetCursorPosition( 0, Console.CursorTop );
+                            Console.Write( ftp._message +"                      ");
+                        }
+                    }
+                } );
                 up.Start();
                 ftp.upload();
                 Thread.Sleep( 10 );
                 up.Abort();
-
                 _State = TaskInfo.State.ok;
+
             } catch (System.Net.WebException) {
                 _State = TaskInfo.State.warning;
             } catch (System.IO.IOException) {
@@ -72,21 +106,21 @@ namespace testbuilds {
             } catch (Exception) {
                 _State = TaskInfo.State.fail;
             }
-
         }
         #endregion
 
         #region AiTests
+        MDouble m;
+        AIMasterDouble ai;
         double[] lo = new double[4];
+
         public void SetAlgorythmos(double l1, double l2, double l3, double l4) {
             lo[0] = l1; lo[1] = l2; lo[2] = l3; lo[3] = l4;
         }
+        RandomGenerator r = new RandomGenerator();
         public void SlotAutomatAlgo(MDouble m, bool ausgabe) {
             double bank = 10000;
             double cash = 100;
-
-            RandomGenerator r = new RandomGenerator();
-
             int i = 0;
 
             while (cash != 0 && bank > 0) {
@@ -119,6 +153,7 @@ namespace testbuilds {
             }
             m.Variable = i;
         }
+
         private void _Ai() {
 
             int loops = 100;
@@ -130,8 +165,8 @@ namespace testbuilds {
             Console.WriteLine( "-----------------SETUP----------------" );
             var t = DateTime.Now;
             SetAlgorythmos( 22, 13, 5, 3 );
-            MDouble m = new MDouble( 1000, 0, lo, SlotAutomatAlgo, 90 );
-            AIMasterDouble ai = new AIMasterDouble( new MDouble[] { m } );
+            m = new MDouble( 1000, 0, lo, SlotAutomatAlgo, 90 );
+            ai = new AIMasterDouble( new MDouble[] { m } );
             Console.WriteLine( m.GetID );
             Console.WriteLine( "done in " + ( DateTime.Now - t ) );
             Console.WriteLine( "Press any Key to enter TrainLoop({0})...", loops );
@@ -164,11 +199,11 @@ namespace testbuilds {
             Console.ReadKey();
             t = DateTime.Now;
             SetAlgorythmos( m.Doubles[0], m.Doubles[1], m.Doubles[2], m.Doubles[3] );
-            MDouble mn = new MDouble( 10000, 0, lo, SlotAutomatAlgo, 1000 );
+            m = new MDouble( 10000, 0, lo, SlotAutomatAlgo, 1000 );
             double max = 0;
             for (int i = 0; i < 100; i++) {
-                SlotAutomatAlgo( mn, true );
-                max = mn.Variable > max ? mn.Variable : max;
+                SlotAutomatAlgo( m, true );
+                max = m.Variable > max ? m.Variable : max;
             }
             Console.WriteLine( "\ndone in " + ( DateTime.Now - t ) + "       Max:" + max );
             t = DateTime.Now;
@@ -177,10 +212,9 @@ namespace testbuilds {
         #endregion
 
         #region ImageScanTest
+        ImageSearch IC = new ImageSearch();
         private void _ImageScan() {
             string Path_to_Bmp = "..\\..\\..\\example.png";
-
-            ImageSearch IC = new ImageSearch();
 
             bool result;
             Point point;

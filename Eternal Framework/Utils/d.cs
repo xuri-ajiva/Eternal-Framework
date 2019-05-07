@@ -69,11 +69,11 @@ namespace Eternal.Utils {
             //    Console.WriteLine( "vailet" );
             return rlDaten;
         }
-        public static string Fullsize(string daten) {
+        public static string Fullsize(string daten, int Rlength) {
             string result = "";
             int length = (int) daten.Length;
 
-            for (int i = length.ToString().Length; i < 5; i++) {
+            for (int i = length.ToString().Length; i < Rlength; i++) {
                 result += "0";
             }
 

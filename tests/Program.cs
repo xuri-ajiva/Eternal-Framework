@@ -9,10 +9,38 @@ using System.Threading.Tasks;
 namespace tests {
     class Program {
         static void Main(string[] args) {
-            testtask t = new testtask( "Test",ConsoleColor.Yellow );
-            t.Run();
-            Console.WriteLine( "E" );
+            Console.WriteLine( Console.OutputEncoding );
+            //Console.OutputEncoding = Encoding.GetEncoding( 1252 );
+            Console.WriteLine( Console.OpenStandardError() );
+            Console.WriteLine(
+@"  	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+250x 	─ 	━ 	│ 	┃ 	┄ 	┅ 	┆ 	┇ 	┈ 	┉ 	┊ 	┋ 	┌ 	┍ 	┎ 	┏
+U+251x 	┐ 	┑ 	┒ 	┓ 	└ 	┕ 	┖ 	┗ 	┘ 	┙ 	┚ 	┛ 	├ 	┝ 	┞ 	┟
+U+252x 	┠ 	┡ 	┢ 	┣ 	┤ 	┥ 	┦ 	┧ 	┨ 	┩ 	┪ 	┫ 	┬ 	┭ 	┮ 	┯
+U+253x 	┰ 	┱ 	┲ 	┳ 	┴ 	┵ 	┶ 	┷ 	┸ 	┹ 	┺ 	┻ 	┼ 	┽ 	┾ 	┿
+U+254x 	╀ 	╁ 	╂ 	╃ 	╄ 	╅ 	╆ 	╇ 	╈ 	╉ 	╊ 	╋ 	╌ 	╍ 	╎ 	╏
+U+255x 	═ 	║ 	╒ 	╓ 	╔ 	╕ 	╖ 	╗ 	╘ 	╙ 	╚ 	╛ 	╜ 	╝ 	╞ 	╟
+U+256x 	╠ 	╡ 	╢ 	╣ 	╤ 	╥ 	╦ 	╧ 	╨ 	╩ 	╪ 	╫ 	╬ 	╭ 	╮ 	╯
+U+257x 	╰ 	╱ 	╲ 	╳ 	╴ 	╵ 	╶ 	╷ 	╸ 	╹ 	╺ 	╻ 	╼ 	╽ 	╾ 	╿ " );
+            /*Console.WriteLine( @"
+            ┌─┬┐  ╔═╦╗  ╓─╥╖  ╒═╤╕
+            │ ││  ║ ║║  ║ ║║  │ ││
+            ├─┼┤  ╠═╬╣  ╟─╫╢  ╞═╪╡
+            └─┴┘  ╚═╩╝  ╙─╨╜  ╘═╧╛
+            ┌───────────────────┐
+            │  ╔═══╗ Some Text  │▒
+            │  ╚═╦═╝ in the box │▒
+            ╞═╤══╩══╤═══════════╡▒
+            │ ├──┬──┤           │▒
+            │ └──┴──┘           │▒
+            └───────────────────┘▒
+             ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+" );*/
             Console.ReadLine();
+            //testtask t = new testtask( "Test",ConsoleColor.Yellow );
+            //t.Run();
+            //Console.WriteLine( "E" );
+            //Console.ReadLine();
         }
     }
 
@@ -44,7 +72,6 @@ namespace tests {
                 _State = State.warning;
                 Thread.Sleep( 2000 );
             }
-            base.Writestate();
         }
     }
 

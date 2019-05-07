@@ -1,5 +1,6 @@
 ﻿//#define pack
 
+using Eternal.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,23 +8,14 @@ using System.Text;
 using System.Threading;
 
 namespace container {
-    internal class Program {
+    public class Program {
         public static string filename = "archife.pac";
         public static string[] files = new string[99];
         private static List<string> fs;// = new List<string>(files);
 
-        public static int l => int.MaxValue.ToString().Length;
+        public static int IntLength => int.MaxValue.ToString().Length;
 
-        private static void Main(string[] args) {
-#if DEBUG
-            Console.WriteLine( "Debug version!" );
-#if pack
-            args = new string[] { "p", @"C:\Users\Private\source\repos\Global\Global.sln", @"C:\Users\Private\source\repos\Global\hallo welt.txt", @"C:\Users\Private\Desktop\Roaming - Kopie.rar" };
-#else
-            args = new string[] { "u", filename };
-#endif
-            //#warning Using Debug
-#endif
+        public Program(string[] args) {
 
             string choise = "";
 
@@ -62,7 +54,7 @@ namespace container {
             }
         }
 
-        private static void pack() {
+        private void pack() {
             List<byte> contend = new List<byte>();
 
             Console.WriteLine( "Creating Header..." );
@@ -78,9 +70,9 @@ namespace container {
                 }
 
                 var info = MakeVailed( tmp.Length.ToString() ) + Path.GetFileName( s );
-                header += pack( info );
+                header += StringSizer.Size( info );
             }
-            var head = Encoding.UTF8.GetBytes( Fullsize( pack( header ).Replace( "\n", "" ) ) );
+            var head = Encoding.UTF8.GetBytes( StringSizer.Fullsize( StringSizer.Size( header ).Replace( "\n", "" ), IntLength ) );
 
             var final = new byte[contend.Count + head.Length];
 
@@ -105,19 +97,19 @@ namespace container {
             head = new byte[1];
             header = "";
         }
-        private static void Unpack() {
+        private void Unpack() {
             List<byte> contend = new List<byte>( File.ReadAllBytes( filename ) );
 
             Console.WriteLine( "reading header..." );
 
-            int hlength = int.Parse( Encoding.UTF8.GetString( contend.GetRange( 0, 20 ).ToArray() ).Substring( 0, l ) );
+            int hlength = int.Parse( Encoding.UTF8.GetString( contend.GetRange( 0, 20 ).ToArray() ).Substring( 0, IntLength ) );
 
-            var ascy = Encoding.UTF8.GetString( contend.GetRange( l, hlength ).ToArray() );
+            var ascy = Encoding.UTF8.GetString( contend.GetRange( IntLength, hlength ).ToArray() );
             int len;
-            string head = restore( ascy, out len );
+            string head = StringSizer.UnSize( ascy, out len );
 
             ascy = "";
-            int fullheadlength = ( len + 2 + head.Length.ToString().Length + 2 ) + l;
+            int fullheadlength = ( len + 2 + head.Length.ToString().Length + 2 ) + IntLength;
 
             Console.WriteLine( "Isolating contend..." );
 
@@ -128,9 +120,9 @@ namespace container {
 
             int c = 1;
             for (int i = 0; i < infos.Length - 1; i++) {
-                string p = restore( infos[i], out int length );
-                var filename = p.Substring( l );
-                int filesize = int.Parse( p.Substring( 0, l ) );
+                string p = StringSizer.UnSize( infos[i], out int length );
+                var filename = p.Substring( IntLength );
+                int filesize = int.Parse( p.Substring( 0, IntLength ) );
 
                 Console.WriteLine( "Processing file:" + filename );
 
@@ -142,11 +134,11 @@ namespace container {
             ascy = "";
         }
 
-        public static string ReverseSize(string daten) {
+        public string ReverseSize(string daten) {
             string result = "";
             short length = (short) daten.Length;
 
-            for (int i = length.ToString().Length; i < l; i++) {
+            for (int i = length.ToString().Length; i < IntLength; i++) {
                 result += "0";
             }
 
@@ -156,58 +148,31 @@ namespace container {
             return result;
         }
 
-        public static string pack(string daten) {
-            string finalData = daten.Replace( "\\", "\\%" ).
-                Replace( "\n", "\\/" );
-
-            return "\\&" + finalData.Length.ToString() + "\\$" + finalData + "\n";
-        }
-        public static string restore(string daten, out int length) {
-            if (daten.Substring( 0, 2 ) != "\\&")
-                throw new Exception( "No vailet String" );
-
-
-            daten = daten.Substring( 2 );
-            int Il = 0;
-            length = 0;
-            for (int i = 0; i < long.MaxValue.ToString().Length; i++)
-                if (daten.Substring( i, 2 ) == "\\$") {
-                    Il = i;
-                    length = int.Parse( daten.Substring( 0, i ) );
-                    break;
-                }
-
-            string rlDaten = daten.Substring( Il + 2, length ).Replace( "\\%", "\\" ).
-                Replace( "\\/", "\n" );
-
-            //if (daten.Substring( Il + 2 + length, 2 ) == "\n")
-            //    Console.WriteLine( "vailet" );
-            return rlDaten;
-        }
-
-        public static string Fullsize(string daten) {
-            string result = "";
-            int length = (int) daten.Length;
-
-            for (int i = length.ToString().Length; i < l; i++) {
-                result += "0";
-            }
-
-            result += length.ToString();
-
-            result += daten;
-            return result;
-        }
-
-        public static string MakeVailed(string size) {
+        public string MakeVailed(string size) {
             string result = "";
 
-            for (int i = size.Length; i < l; i++) {
+            for (int i = size.Length; i < IntLength; i++) {
                 result += "0";
             }
 
             result += size;
             return result;
+        }
+
+        static int Main(string[] args) {
+#if DEBUG
+            Console.WriteLine( "Debug version!" );
+#if pack
+            args = new string[] { "p", @"C:\Users\Private\source\repos\Global\Global.sln", @"C:\Users\Private\source\repos\Global\hallo welt.txt", @"C:\Users\Private\Desktop\Roaming - Kopie.rar" };
+#else
+            args = new string[] { "u", filename };
+#endif
+            //#warning Using Debug
+#endif
+
+            Program program = new Program( args );
+
+            return 0;
         }
     }
 }

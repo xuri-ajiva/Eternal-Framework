@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Tasks", "System.Task
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eternal Framework", "Eternal Framework\Eternal Framework.csproj", "{8C39C554-4976-4469-A273-5124DF799361}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "System", "System", "{C6DDCC77-5C6F-4D44-9C90-F4EA3262F4C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9EC7BA5E-C614-4902-A116-D87AD267A0E8} = {C6DDCC77-5C6F-4D44-9C90-F4EA3262F4C6}
+		{DEF2E53C-3BC3-4D1A-A90D-61DD1FE934E1} = {C6DDCC77-5C6F-4D44-9C90-F4EA3262F4C6}
+		{CC865EAB-49D9-49E5-B439-1D48169353FE} = {C6DDCC77-5C6F-4D44-9C90-F4EA3262F4C6}
+		{7BF544E9-672C-4154-BDE4-62E3A085B5DE} = {C6DDCC77-5C6F-4D44-9C90-F4EA3262F4C6}
+		{92BC7DD8-2520-4366-A45D-EEA2AAC80108} = {C6DDCC77-5C6F-4D44-9C90-F4EA3262F4C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F8607D5D-1253-4230-840E-6DFF25F19B8E}
