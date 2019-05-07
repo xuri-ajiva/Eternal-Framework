@@ -7,6 +7,7 @@ using System.Ftp;
 using System.ImageScan;
 using System.IO;
 using System.Linq;
+using System.Tasks;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,23 +17,62 @@ using testbuilds.TestUtils;
 
 namespace testbuilds {
     class Program {
-        void Main(string[] args) {
-
+        public static void Main(string[] args) {
+            var p = new Program();
+        }
+        public Program() {
             ChoisObjekts ftp = new ChoisObjekts( "FtpTest", _Ftp );
             ChoisObjekts ims = new ChoisObjekts( "ImageScanTest", _ImageScan );
             ChoisObjekts ai = new ChoisObjekts( "AiTest", _Ai );
+            ChoisObjekts task = new ChoisObjekts( "Testtest With Ftp", _Task );
 
-            Utils.SetupChoise( new ChoisObjekts[] { ftp, ai, ims } );
-
-            Console.WriteLine( "Press any Key t Exit..." );
-            Console.ReadLine();
+            Utils.SetupChoise( new ChoisObjekts[] { ftp, task, ai, ims } );
+            Console.WriteLine("\n");
+            Console.WriteLine( "Press any Key to Exit!" );
+            Console.ReadKey();
+            Console.Clear();
+            Thread.Sleep( 500 );
+            Environment.Exit( 0 );
         }
 
+        #region TaskTrack
+        System.Tasks.Task.State _State = System.Tasks.Task.State.None;
+        private void _Task() {
+            System.Tasks.Task t = new System.Tasks.Task( " ", _Ftp );
+
+            Thread update = new Thread( () => {
+                while (true) {
+                    t._State = _State;
+                    t._Name = ftpMessage;
+                }
+            } );
+            update.Start();
+            t.Run();
+        }
+        #endregion
+
         #region FtpTest
+        public string ftpMessage = "";
         private void _Ftp() {
             var filename = "Roaming.rar";
-            FtpClinet ftp = new FtpClinet( "ftp://127.0.0.1/" + filename, "test", Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) ), filename, (int) Math.Pow( 2, 26 ) );
-            ftp.upload();
+            _State = System.Tasks.Task.State.running;
+            try {
+                FtpClinet ftp = new FtpClinet( "ftp://127.0.0.1/" + filename, "test", Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) ), filename, (int) Math.Pow( 2, 26 ) );
+                Thread up = new Thread( () => { while (true) { ftpMessage = ftp._message; } } );
+                up.Start();
+                ftp.upload();
+                Thread.Sleep( 10 );
+                up.Abort();
+
+                _State = System.Tasks.Task.State.ok;
+            } catch (System.Net.WebException) {
+                _State = System.Tasks.Task.State.warning;
+            } catch (System.IO.IOException) {
+                _State = System.Tasks.Task.State.critical;
+            } catch (Exception) {
+                _State = System.Tasks.Task.State.fail;
+            }
+
         }
         #endregion
 

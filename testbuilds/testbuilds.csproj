@@ -65,6 +65,10 @@
       <Project>{7bf544e9-672c-4154-bde4-62e3a085b5de}</Project>
       <Name>System.ImageScan</Name>
     </ProjectReference>
+    <ProjectReference Include="..\System.Tasks\System.Tasks.csproj">
+      <Project>{92bc7dd8-2520-4366-a45d-eea2aac80108}</Project>
+      <Name>System.Tasks</Name>
+    </ProjectReference>
     <ProjectReference Include="..\System.Utils\System.Utils.csproj">
       <Project>{cc865eab-49d9-49e5-b439-1d48169353fe}</Project>
       <Name>System.Utils</Name>

@@ -9,7 +9,7 @@ namespace System.Tasks {
 
     public class Task {
         Guid _Guid = Guid.NewGuid();
-        public string _Name { get; private set; }
+        public string _Name { get; set; }
         public enum State {
             None,
             running,
@@ -25,24 +25,33 @@ namespace System.Tasks {
         public bool IsRunning = false;
 
         private Thread _Thread;
+        private Action _run;
 
-        public Task(string Name, ConsoleColor NormalColor = ConsoleColor.White) {
+        public Task(string Name, Action run, ConsoleColor NormalColor = ConsoleColor.White) {
             _Name = Name;
             _NormalClolor = NormalColor;
+            _run = run;
             _Thread = new Thread( () => {
                 while (true) {
-                    Thread.Sleep( 200 );
+                    Thread.Sleep( 150 );
                     if (IsRunning)
                         Writestate();
                 }
             } );
             _Thread.Start();
         }
-        public virtual void Run(Action Void) {
+        private int line = 0;
+        public virtual void Run(bool startgivenvoid = true) {
             Console.ForegroundColor = _NormalClolor;
+            line = Console.CursorTop;
             Console.Write( "[       ]: " + _Name );
             IsRunning = true;
-            Void();
+
+            if (startgivenvoid) {
+                _run();
+                IsRunning = false;
+                Writestate();
+            }
         }
         public virtual void Abort() {
             _Thread.Abort();
@@ -53,9 +62,12 @@ namespace System.Tasks {
             _State = State.None;
         }
         public void Writestate() {
-            Console.SetCursorPosition( 1, Console.CursorTop );
 
             string Msg = "";
+
+            Console.SetCursorPosition( 0, line );
+            Console.Write( "[       ]: " + _Name );
+            Console.SetCursorPosition( 1, line );
 
             switch (_State) {
                 case State.None:
@@ -93,6 +105,7 @@ namespace System.Tasks {
                 default:
                     break;
             }
+
             Console.Write( Msg );
             Console.ForegroundColor = _NormalClolor;
         }

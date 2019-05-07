@@ -10,6 +10,7 @@ using System.Windows.Documents;
 namespace System.Ftp {
     public class FtpClinet {
 
+        public string _message;
         public string _Name;
         public string _Base64Password;
         public string _File;
@@ -28,7 +29,8 @@ namespace System.Ftp {
             upload( _FtpAddres, _Name, _Base64Password, _File, _BufferLength );
         }
         public void upload(string FtpAddres, string Name, string Base64Password, string file, int BufferLength) {
-            Console.Write( "Uploading...\nUploaded " );
+            int currentpos = Console.CursorLeft;
+            _message = "Uploadeding... ";
             var dt = DateTime.Now;
             FtpWebRequest request =
     (FtpWebRequest) WebRequest.Create( FtpAddres );
@@ -41,19 +43,19 @@ namespace System.Ftp {
                 int read;
                 while (( read = fileStream.Read( buffer, 0, buffer.Length ) ) > 0) {
                     ftpStream.Write( buffer, 0, read );
-                    Console.SetCursorPosition( 9, Console.CursorTop );
-                    Console.Write("                                ");
-                    Console.SetCursorPosition( 9, Console.CursorTop );
-                    Console.Write( "{0} bytes", fileStream.Position );
+
+
+                    _message = "Uploaded " + fileStream.Position + " bytes";
                 }
             }
-            Console.WriteLine( "\nFinished in {0}!",( DateTime.Now-dt));
+            _message = $"Finished in {( DateTime.Now - dt )}!";
         }
         public void download() {
             download( _FtpAddres, _Name, _Base64Password, _File, _BufferLength );
         }
         public void download(string FtpAddres, string Name, string Base64Password, string file, int BufferLength) {
-            Console.Write( "Downloading...\nDownloaded " );
+            int currentpos = Console.CursorLeft;
+            Console.Write( "Downloaded " );
             var dt = DateTime.Now;
             FtpWebRequest request =
     (FtpWebRequest) WebRequest.Create( FtpAddres );
@@ -66,13 +68,13 @@ namespace System.Ftp {
                 int read;
                 while (( read = ftpStream.Read( buffer, 0, buffer.Length ) ) > 0) {
                     fileStream.Write( buffer, 0, read );
-                    Console.SetCursorPosition( 11, Console.CursorTop );
+                    Console.SetCursorPosition( currentpos + 11, Console.CursorTop );
                     Console.Write( "                                " );
-                    Console.SetCursorPosition( 11, Console.CursorTop );
+                    Console.SetCursorPosition( currentpos + 11, Console.CursorTop );
                     Console.Write( "{0} bytes", fileStream.Position );
                 }
             }
-            Console.WriteLine( "\nFinished in {0}!", ( DateTime.Now - dt ));
+            Console.WriteLine( "\nFinished in {0}!", ( DateTime.Now - dt ) );
         }
     }
 }
