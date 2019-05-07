@@ -1,17 +1,17 @@
-﻿using System;
-using System.Ai;
-using System.Ai.Modle;
+﻿using Eternal.Ai;
+using Eternal.Ai.Modle;
+using Eternal.Drawing;
+using Eternal.Net;
+using Eternal.Utils;
+using Eternal.Visualisation;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Ftp;
-using System.ImageScan;
 using System.IO;
 using System.Linq;
-using System.Tasks;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Utils;
 using System.Windows.Forms;
 using testbuilds.TestUtils;
 
@@ -27,7 +27,7 @@ namespace testbuilds {
             ChoisObjekts task = new ChoisObjekts( "Testtest With Ftp", _Task );
 
             Utils.SetupChoise( new ChoisObjekts[] { ftp, task, ai, ims } );
-            Console.WriteLine("\n");
+            Console.WriteLine( "\n" );
             Console.WriteLine( "Press any Key to Exit!" );
             Console.ReadKey();
             Console.Clear();
@@ -36,9 +36,9 @@ namespace testbuilds {
         }
 
         #region TaskTrack
-        System.Tasks.Task.State _State = System.Tasks.Task.State.None;
+        TaskInfo.State _State = TaskInfo.State.None;
         private void _Task() {
-            System.Tasks.Task t = new System.Tasks.Task( " ", _Ftp );
+            TaskInfo t = new TaskInfo( " ", _Ftp );
 
             Thread update = new Thread( () => {
                 while (true) {
@@ -55,7 +55,7 @@ namespace testbuilds {
         public string ftpMessage = "";
         private void _Ftp() {
             var filename = "Roaming.rar";
-            _State = System.Tasks.Task.State.running;
+            _State = TaskInfo.State.running;
             try {
                 FtpClinet ftp = new FtpClinet( "ftp://127.0.0.1/" + filename, "test", Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) ), filename, (int) Math.Pow( 2, 26 ) );
                 Thread up = new Thread( () => { while (true) { ftpMessage = ftp._message; } } );
@@ -64,13 +64,13 @@ namespace testbuilds {
                 Thread.Sleep( 10 );
                 up.Abort();
 
-                _State = System.Tasks.Task.State.ok;
+                _State = TaskInfo.State.ok;
             } catch (System.Net.WebException) {
-                _State = System.Tasks.Task.State.warning;
+                _State = TaskInfo.State.warning;
             } catch (System.IO.IOException) {
-                _State = System.Tasks.Task.State.critical;
+                _State = TaskInfo.State.critical;
             } catch (Exception) {
-                _State = System.Tasks.Task.State.fail;
+                _State = TaskInfo.State.fail;
             }
 
         }
@@ -131,8 +131,8 @@ namespace testbuilds {
             var t = DateTime.Now;
             SetAlgorythmos( 22, 13, 5, 3 );
             MDouble m = new MDouble( 1000, 0, lo, SlotAutomatAlgo, 90 );
-            System.Ai.AIMasterDouble ai = new AIMasterDouble( new MDouble[] { m } );
-            Console.WriteLine( m.Guid );
+            AIMasterDouble ai = new AIMasterDouble( new MDouble[] { m } );
+            Console.WriteLine( m.GetID );
             Console.WriteLine( "done in " + ( DateTime.Now - t ) );
             Console.WriteLine( "Press any Key to enter TrainLoop({0})...", loops );
             Console.ReadKey();
@@ -180,13 +180,13 @@ namespace testbuilds {
         private void _ImageScan() {
             string Path_to_Bmp = "..\\..\\..\\example.png";
 
-            ImageScan IC = new ImageScan();
+            ImageSearch IC = new ImageSearch();
 
             bool result;
             Point point;
             TimeSpan TS;
             int Tolleranz = 50;
-            ImageScan.ImageScanMethode Ism = ImageScan.ImageScanMethode.Fast;
+            ImageSearch.ImageScanMethode Ism = ImageSearch.ImageScanMethode.Fast;
             Console.WriteLine( Path.GetDirectoryName( Path_to_Bmp ) );
             var b = new Bitmap( Path_to_Bmp );
 
