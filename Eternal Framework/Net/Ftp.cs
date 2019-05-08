@@ -4,7 +4,7 @@ using System.Net;
 using System.Text;
 
 namespace Eternal.Net {
-    public class FtpClinet : EternalFramework.Eternal {
+    public class FtpClinet : EternalFramework.EternalMain {
 
         public string Message;
         public string Name;

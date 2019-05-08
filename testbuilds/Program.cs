@@ -13,9 +13,9 @@ using testbuilds.TestUtils;
 
 namespace testbuilds {
     class Program {
-        public static void Main(string[] args)
-        {
-           new Program();
+        public static void Main(string[] args) {
+            new EternalFramework.EternalMain( 1 );
+            new Program();
         }
 
         public Program() {
@@ -200,7 +200,7 @@ namespace testbuilds {
                 SlotAutomatAlgo( _m, true );
                 max = _m.Variable > max ? _m.Variable : max;
             }
-            Console.WriteLine($"\ndone in {DateTime.Now - t}       Max:{max}");
+            Console.WriteLine( $"\ndone in {DateTime.Now - t}       Max:{max}" );
             Console.WriteLine( "---------------FINISHED---------------" );
         }
         #endregion

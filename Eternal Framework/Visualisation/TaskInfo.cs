@@ -2,7 +2,7 @@
 using System.Threading;
 
 namespace Eternal.Visualisation {
-   public class TaskInfo : EternalFramework.Eternal {
+   public class TaskInfo : EternalFramework.EternalMain {
         Guid _Guid = Guid.NewGuid();
         public string _Name { get; set; }
         public enum State {

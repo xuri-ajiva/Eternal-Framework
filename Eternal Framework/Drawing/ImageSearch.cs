@@ -8,7 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 namespace Eternal.Drawing {
-    public class ImageSearch : EternalFramework.Eternal {
+    public class ImageSearch : EternalFramework.EternalMain {
         public enum ImageScanMethode {
             Fast = 129093810,
             Slow = 329876329

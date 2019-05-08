@@ -2,7 +2,7 @@
 using Eternal.Ai.Modle;
 
 namespace Eternal.Ai {
-    public class AiMasterInt64 : EternalFramework.Eternal {
+    public class AiMasterInt64 : EternalFramework.EternalMain {
         public MInt64[] ModleList;
         private DateTime _ts;
 
@@ -74,7 +74,7 @@ namespace Eternal.Ai {
             Console.WriteLine();
         }
     }
-    public class AiMasterDouble : EternalFramework.Eternal {
+    public class AiMasterDouble : EternalFramework.EternalMain {
         public MDouble[] ModleList;
         private DateTime _ts;
 
@@ -216,12 +216,12 @@ namespace Eternal.Ai.Modle {
 
         }
     }
-    internal class Algos : EternalFramework.Eternal {
+    internal class Algos : EternalFramework.EternalMain {
         public virtual void OnMainInt64(MInt64 m) { }
 
         public virtual void OnMainDouble(MDouble m, bool ausgabe = false) { }
     }
-    public class Base : EternalFramework.Eternal {
+    public class Base : EternalFramework.EternalMain {
         public bool init;
 
         public int[] Integers;
