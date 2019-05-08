@@ -8,33 +8,31 @@ using System.Threading.Tasks;
 
 namespace XOR_Enc.utils
 {
-    class crypt
+    class Crypt
 
     {
         public static void AES_Encrypt(string inputFile, string outputFile, byte[] passwordBytes)
         {
-            byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-            string cryptFile = outputFile;
-            FileStream fsCrypt = new FileStream(cryptFile, FileMode.Create);
+            var saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            var cryptFile = outputFile;
+            var fsCrypt = new FileStream(cryptFile, FileMode.Create);
 
-            RijndaelManaged AES = new RijndaelManaged();
+            var aes = new RijndaelManaged {KeySize = 256, BlockSize = 128};
 
-            AES.KeySize = 256;
-            AES.BlockSize = 128;
 
 
             var key = new Rfc2898DeriveBytes(passwordBytes, saltBytes, 1000);
-            AES.Key = key.GetBytes(AES.KeySize / 8);
-            AES.IV = key.GetBytes(AES.BlockSize / 8);
-            AES.Padding = PaddingMode.Zeros;
+            aes.Key = key.GetBytes(aes.KeySize / 8);
+            aes.IV = key.GetBytes(aes.BlockSize / 8);
+            aes.Padding = PaddingMode.Zeros;
 
-            AES.Mode = CipherMode.CBC;
+            aes.Mode = CipherMode.CBC;
 
-            CryptoStream cs = new CryptoStream(fsCrypt,
-                 AES.CreateEncryptor(),
+            var cs = new CryptoStream(fsCrypt,
+                 aes.CreateEncryptor(),
                 CryptoStreamMode.Write);
 
-            FileStream fsIn = new FileStream(inputFile, FileMode.Open);
+            var fsIn = new FileStream(inputFile, FileMode.Open);
 
             int data;
             while ((data = fsIn.ReadByte()) != -1)
@@ -52,27 +50,27 @@ namespace XOR_Enc.utils
 
 
 
-            byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-            FileStream fsCrypt = new FileStream(inputFile, FileMode.Open);
+            var saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            var fsCrypt = new FileStream(inputFile, FileMode.Open);
 
-            RijndaelManaged AES = new RijndaelManaged();
+            var aes = new RijndaelManaged();
 
-            AES.KeySize = 256;
-            AES.BlockSize = 128;
+            aes.KeySize = 256;
+            aes.BlockSize = 128;
 
 
             var key = new Rfc2898DeriveBytes(passwordBytes, saltBytes, 1000);
-            AES.Key = key.GetBytes(AES.KeySize / 8);
-            AES.IV = key.GetBytes(AES.BlockSize / 8);
-            AES.Padding = PaddingMode.Zeros;
+            aes.Key = key.GetBytes(aes.KeySize / 8);
+            aes.IV = key.GetBytes(aes.BlockSize / 8);
+            aes.Padding = PaddingMode.Zeros;
 
-            AES.Mode = CipherMode.CBC;
+            aes.Mode = CipherMode.CBC;
 
-            CryptoStream cs = new CryptoStream(fsCrypt,
-                AES.CreateDecryptor(),
+            var cs = new CryptoStream(fsCrypt,
+                aes.CreateDecryptor(),
                 CryptoStreamMode.Read);
 
-            FileStream fsOut = new FileStream(outputFile, FileMode.Create);
+            var fsOut = new FileStream(outputFile, FileMode.Create);
 
             int data;
             while ((data = cs.ReadByte()) != -1)
@@ -84,16 +82,16 @@ namespace XOR_Enc.utils
 
         }
     }
-    public class datn
+    public class Datn
     {
-        private string front = "0x";
-        private string privstr = "00000000";
+        private string _front = "0x";
+        private string _privstr = "00000000";
 
-        public void set(int index, int vaule)
+        public void Set(int index, int vaule)
         {
-            privstr = privstr.Substring(0, privstr.Length - index - 1) + vaule.ToString("X") + privstr.Substring(privstr.Length - index);
+            _privstr = _privstr.Substring(0, _privstr.Length - index - 1) + vaule.ToString("X") + _privstr.Substring(_privstr.Length - index);
         }
-        public string get { get { return front + privstr; } }
-        public string getIndex(int index) { return privstr.Substring(privstr.Length - index - 1, 1); }
+        public string Get { get { return _front + _privstr; } }
+        public string GetIndex(int index) { return _privstr.Substring(_privstr.Length - index - 1, 1); }
     }
 }

@@ -17,7 +17,7 @@ namespace container {
 
         public Program(string[] args) {
 
-            string choise = "";
+            var choise = "";
 
             if (args.Length > 0)
                 choise = args[0];
@@ -45,7 +45,7 @@ namespace container {
                 } else
                     goto ask;
 
-                for (int i = 5; i > 0; i--) {
+                for (var i = 5; i > 0; i--) {
                     Console.SetCursorPosition( 0, Console.CursorTop );
                     Console.Write( "Programm exit in " + i.ToString() );
                     Thread.Sleep( 500 );
@@ -55,17 +55,17 @@ namespace container {
         }
 
         private void pack() {
-            List<byte> contend = new List<byte>();
+            var contend = new List<byte>();
 
             Console.WriteLine( "Creating Header..." );
 
-            string header = "";
-            foreach (string s in fs) {
+            var header = "";
+            foreach (var s in fs) {
 
                 Console.WriteLine( "Processing file:" + s );
 
                 var tmp = File.ReadAllBytes( s );
-                foreach (byte i in tmp) {
+                foreach (var i in tmp) {
                     contend.Add( i );
                 }
 
@@ -78,12 +78,12 @@ namespace container {
 
             Console.WriteLine( "Creating binery..." );
 
-            int t = 0;
-            for (int i = t; i < head.Length; i++, t++) {
+            var t = 0;
+            for (var i = t; i < head.Length; i++, t++) {
                 final[t] = head[t];
             }
 
-            for (int i = 0; i < contend.Count; i++, t++) {
+            for (var i = 0; i < contend.Count; i++, t++) {
                 final[t] = contend[i];
             }
 
@@ -98,18 +98,18 @@ namespace container {
             header = "";
         }
         private void Unpack() {
-            List<byte> contend = new List<byte>( File.ReadAllBytes( filename ) );
+            var contend = new List<byte>( File.ReadAllBytes( filename ) );
 
             Console.WriteLine( "reading header..." );
 
-            int hlength = int.Parse( Encoding.UTF8.GetString( contend.GetRange( 0, 20 ).ToArray() ).Substring( 0, IntLength ) );
+            var hlength = int.Parse( Encoding.UTF8.GetString( contend.GetRange( 0, 20 ).ToArray() ).Substring( 0, IntLength ) );
 
             var ascy = Encoding.UTF8.GetString( contend.GetRange( IntLength, hlength ).ToArray() );
             int len;
-            string head = StringSizer.UnSize( ascy, out len );
+            var head = StringSizer.UnSize( ascy, out len );
 
             ascy = "";
-            int fullheadlength = ( len + 2 + head.Length.ToString().Length + 2 ) + IntLength;
+            var fullheadlength = ( len + 2 + head.Length.ToString().Length + 2 ) + IntLength;
 
             Console.WriteLine( "Isolating contend..." );
 
@@ -118,11 +118,11 @@ namespace container {
 
             var infos = head.Split( '\n' );
 
-            int c = 1;
-            for (int i = 0; i < infos.Length - 1; i++) {
-                string p = StringSizer.UnSize( infos[i], out int length );
+            var c = 1;
+            for (var i = 0; i < infos.Length - 1; i++) {
+                var p = StringSizer.UnSize( infos[i], out var length );
                 var filename = p.Substring( IntLength );
-                int filesize = int.Parse( p.Substring( 0, IntLength ) );
+                var filesize = int.Parse( p.Substring( 0, IntLength ) );
 
                 Console.WriteLine( "Processing file:" + filename );
 
@@ -135,10 +135,10 @@ namespace container {
         }
 
         public string ReverseSize(string daten) {
-            string result = "";
-            short length = (short) daten.Length;
+            var result = "";
+            var length = (short) daten.Length;
 
-            for (int i = length.ToString().Length; i < IntLength; i++) {
+            for (var i = length.ToString().Length; i < IntLength; i++) {
                 result += "0";
             }
 
@@ -149,9 +149,9 @@ namespace container {
         }
 
         public string MakeVailed(string size) {
-            string result = "";
+            var result = "";
 
-            for (int i = size.Length; i < IntLength; i++) {
+            for (var i = size.Length; i < IntLength; i++) {
                 result += "0";
             }
 
@@ -170,7 +170,7 @@ namespace container {
             //#warning Using Debug
 #endif
 
-            Program program = new Program( args );
+            var program = new Program( args );
 
             return 0;
         }

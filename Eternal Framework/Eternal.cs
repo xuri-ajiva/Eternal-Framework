@@ -1,33 +1,30 @@
 ﻿//#undef DEBUG
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EternalFramework {
     public class Eternal {
-        private Guid _Guid = Guid.NewGuid();
-        private static bool Used = false;
+        private readonly Guid _guid = Guid.NewGuid();
+        private static bool _used;
         public const string SoftwareName = "Eternal";
         public Eternal() {
 #if DEBUG
             var c = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            if (!Used) {
+            if (!_used) {
                 Console.WriteLine();
-                Console.WriteLine( $"   ┌────────────────────────────────────────╖" );
-                Console.WriteLine( $"   │ You are using Eternal in Used version! ║" );
-                Console.WriteLine( $"   ╘════════════════════════════════════════╝" );
+                Console.WriteLine( "   ┌────────────────────────────────────────╖" );
+                Console.WriteLine( "   │ You are using Eternal in Used version! ║" );
+                Console.WriteLine( "   ╘════════════════════════════════════════╝" );
                 Console.WriteLine();
 
             }
             Console.ForegroundColor = c;
-            Used = true;
+            _used = true;
 #else
             var c = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            if (!Used) {
+            if (!_used) {
                 Console.WriteLine();
                 Console.WriteLine( $"   ┌────────────────────────────────────────────────╖" );
                 Console.WriteLine( $"   │ You are using Eternal Framework version 1.0.0! ║" );
@@ -35,9 +32,9 @@ namespace EternalFramework {
                 Console.WriteLine();
             }
             Console.ForegroundColor = c;
-            Used = true;
+            _used = true;
 #endif
         }
-        public string GetID => _Guid.ToString();
+        public string GetId => _guid.ToString();
     }
 }

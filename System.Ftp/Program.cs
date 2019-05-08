@@ -29,17 +29,17 @@ namespace System.Ftp {
             upload( _FtpAddres, _Name, _Base64Password, _File, _BufferLength );
         }
         public void upload(string FtpAddres, string Name, string Base64Password, string file, int BufferLength) {
-            int currentpos = Console.CursorLeft;
+            var currentpos = Console.CursorLeft;
             _message = "Uploadeding... ";
             var dt = DateTime.Now;
-            FtpWebRequest request =
+            var request =
     (FtpWebRequest) WebRequest.Create( FtpAddres );
             request.Credentials = new NetworkCredential( Name, Encoding.UTF8.GetString( Convert.FromBase64String( Base64Password ) ) );
             request.Method = WebRequestMethods.Ftp.UploadFile;
 
             using (Stream fileStream = File.OpenRead( file ))
-            using (Stream ftpStream = request.GetRequestStream()) {
-                byte[] buffer = new byte[BufferLength];
+            using (var ftpStream = request.GetRequestStream()) {
+                var buffer = new byte[BufferLength];
                 int read;
                 while (( read = fileStream.Read( buffer, 0, buffer.Length ) ) > 0) {
                     ftpStream.Write( buffer, 0, read );
@@ -54,17 +54,17 @@ namespace System.Ftp {
             download( _FtpAddres, _Name, _Base64Password, _File, _BufferLength );
         }
         public void download(string FtpAddres, string Name, string Base64Password, string file, int BufferLength) {
-            int currentpos = Console.CursorLeft;
+            var currentpos = Console.CursorLeft;
             Console.Write( "Downloaded " );
             var dt = DateTime.Now;
-            FtpWebRequest request =
+            var request =
     (FtpWebRequest) WebRequest.Create( FtpAddres );
             request.Credentials = new NetworkCredential( Name, Encoding.UTF8.GetString( Convert.FromBase64String( Base64Password ) ) );
             request.Method = WebRequestMethods.Ftp.DownloadFile;
 
-            using (Stream ftpStream = request.GetResponse().GetResponseStream())
+            using (var ftpStream = request.GetResponse().GetResponseStream())
             using (Stream fileStream = File.Create( file )) {
-                byte[] buffer = new byte[BufferLength];
+                var buffer = new byte[BufferLength];
                 int read;
                 while (( read = ftpStream.Read( buffer, 0, buffer.Length ) ) > 0) {
                     fileStream.Write( buffer, 0, read );

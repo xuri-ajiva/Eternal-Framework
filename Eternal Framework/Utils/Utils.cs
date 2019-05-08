@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eternal.Utils {
     public class RandomGenerator {
-        private readonly RNGCryptoServiceProvider csp;
+        private readonly RNGCryptoServiceProvider _csp;
 
         public RandomGenerator() {
-            csp = new RNGCryptoServiceProvider();
+            _csp = new RNGCryptoServiceProvider();
         }
 
         public int Next(int minValue, int maxExclusiveValue) {
@@ -18,8 +14,8 @@ namespace Eternal.Utils {
                 throw new ArgumentOutOfRangeException( "minValue must be lower than maxExclusiveValue" );
             }
 
-            long diff = (long) maxExclusiveValue - minValue;
-            long upperBound = uint.MaxValue / diff * diff;
+            var diff = (long) maxExclusiveValue - minValue;
+            var upperBound = uint.MaxValue / diff * diff;
 
             uint ui;
             do {
@@ -34,18 +30,18 @@ namespace Eternal.Utils {
         }
 
         private byte[] GenerateRandomBytes(int bytesNumber) {
-            byte[] buffer = new byte[bytesNumber];
-            csp.GetBytes( buffer );
+            var buffer = new byte[bytesNumber];
+            _csp.GetBytes( buffer );
             return buffer;
         }
     }
     public static class StringSizer {
 
         public static string Size(string daten) {
-            string finalData = daten.Replace( "\\", "\\%" ).
+            var finalData = daten.Replace( "\\", "\\%" ).
                 Replace( "\n", "\\/" );
 
-            return "\\&" + finalData.Length.ToString() + "\\$" + finalData + "\n";
+            return "\\&" + finalData.Length + "\\$" + finalData + "\n";
         }
         public static string UnSize(string daten, out int length) {
             if (daten.Substring( 0, 2 ) != "\\&")
@@ -53,16 +49,16 @@ namespace Eternal.Utils {
 
 
             daten = daten.Substring( 2 );
-            int Il = 0;
+            var il = 0;
             length = 0;
-            for (int i = 0; i < long.MaxValue.ToString().Length; i++)
+            for (var i = 0; i < long.MaxValue.ToString().Length; i++)
                 if (daten.Substring( i, 2 ) == "\\$") {
-                    Il = i;
+                    il = i;
                     length = int.Parse( daten.Substring( 0, i ) );
                     break;
                 }
 
-            string rlDaten = daten.Substring( Il + 2, length ).Replace( "\\%", "\\" ).
+            var rlDaten = daten.Substring( il + 2, length ).Replace( "\\%", "\\" ).
                 Replace( "\\/", "\n" );
 
             //if (daten.Substring( Il + 2 + length, 2 ) == "\n")
@@ -70,10 +66,10 @@ namespace Eternal.Utils {
             return rlDaten;
         }
         public static string Fullsize(string daten, int Rlength) {
-            string result = "";
-            int length = (int) daten.Length;
+            var result = "";
+            var length = daten.Length;
 
-            for (int i = length.ToString().Length; i < Rlength; i++) {
+            for (var i = length.ToString().Length; i < Rlength; i++) {
                 result += "0";
             }
 

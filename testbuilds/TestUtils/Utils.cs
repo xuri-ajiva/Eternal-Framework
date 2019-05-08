@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace testbuilds.TestUtils {
     class Utils {
         internal static void SetupChoise(ChoisObjekts[] choises) {
-            for (int i = 0; i < choises.Length; i++) {
+            for (var i = 0; i < choises.Length; i++) {
                 Console.WriteLine( $"[{i}]: {choises[i]._Name}" );
             }
             Console.WriteLine( "Bitte Wählen" );

@@ -18,8 +18,8 @@ namespace System.Utils {
                 throw new ArgumentOutOfRangeException( "minValue must be lower than maxExclusiveValue" );
             }
 
-            long diff = (long) maxExclusiveValue - minValue;
-            long upperBound = uint.MaxValue / diff * diff;
+            var diff = (long) maxExclusiveValue - minValue;
+            var upperBound = uint.MaxValue / diff * diff;
 
             uint ui;
             do {
@@ -34,7 +34,7 @@ namespace System.Utils {
         }
 
         private byte[] GenerateRandomBytes(int bytesNumber) {
-            byte[] buffer = new byte[bytesNumber];
+            var buffer = new byte[bytesNumber];
             csp.GetBytes( buffer );
             return buffer;
         }
@@ -42,7 +42,7 @@ namespace System.Utils {
     public static class StringSizer {
 
         public static string Size(string daten) {
-            string finalData = daten.Replace( "\\", "\\%" ).
+            var finalData = daten.Replace( "\\", "\\%" ).
                 Replace( "\n", "\\/" );
 
             return "\\&" + finalData.Length.ToString() + "\\$" + finalData + "\n";
@@ -53,16 +53,16 @@ namespace System.Utils {
 
 
             daten = daten.Substring( 2 );
-            int Il = 0;
+            var Il = 0;
             length = 0;
-            for (int i = 0; i < long.MaxValue.ToString().Length; i++)
+            for (var i = 0; i < long.MaxValue.ToString().Length; i++)
                 if (daten.Substring( i, 2 ) == "\\$") {
                     Il = i;
                     length = int.Parse( daten.Substring( 0, i ) );
                     break;
                 }
 
-            string rlDaten = daten.Substring( Il + 2, length ).Replace( "\\%", "\\" ).
+            var rlDaten = daten.Substring( Il + 2, length ).Replace( "\\%", "\\" ).
                 Replace( "\\/", "\n" );
 
             //if (daten.Substring( Il + 2 + length, 2 ) == "\n")
@@ -70,10 +70,10 @@ namespace System.Utils {
             return rlDaten;
         }
         public static string Fullsize(string daten) {
-            string result = "";
-            int length = (int) daten.Length;
+            var result = "";
+            var length = (int) daten.Length;
 
-            for (int i = length.ToString().Length; i < 5; i++) {
+            for (var i = length.ToString().Length; i < 5; i++) {
                 result += "0";
             }
 

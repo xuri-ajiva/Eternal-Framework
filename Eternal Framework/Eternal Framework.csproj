@@ -51,7 +51,7 @@
     <Compile Include="Eternal.cs" />
     <Compile Include="Net\Ftp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\d.cs" />
+    <Compile Include="Utils\Utils.cs" />
     <Compile Include="Visualisation\TaskInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

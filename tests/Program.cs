@@ -95,7 +95,7 @@ U+257x 	╰ 	╱ 	╲ 	╳ 	╴ 	╵ 	╶ 	╷ 	╸ 	╹ 	╺ 	╻ 	╼ 	╽ 	�
         public Task(string Name, ConsoleColor NormalColor = ConsoleColor.White) {
             _Name = Name;
             _NormalClolor = NormalColor;
-            Thread t = new Thread( () => {
+            var t = new Thread( () => {
                 while (true) {
                     Thread.Sleep( 200 );
                     if (IsRunning)
@@ -113,13 +113,13 @@ U+257x 	╰ 	╱ 	╲ 	╳ 	╴ 	╵ 	╶ 	╷ 	╸ 	╹ 	╺ 	╻ 	╼ 	╽ 	�
         public void Writestate() {
             Console.SetCursorPosition( 1, Console.CursorTop );
 
-            string Msg = "";
+            var Msg = "";
 
             switch (_State) {
                 case State.None:
                     break;
                 case State.running:
-                    for (int i = 0; i < 7; i++) {
+                    for (var i = 0; i < 7; i++) {
                         Msg += i == id ? "*" : " ";
                     }
                     Console.ForegroundColor = ConsoleColor.Cyan;

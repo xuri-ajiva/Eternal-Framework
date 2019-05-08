@@ -63,7 +63,7 @@ namespace System.Tasks {
         }
         public void Writestate() {
 
-            string Msg = "";
+            var Msg = "";
 
             Console.SetCursorPosition( 0, line );
             Console.Write( "[       ]: " + _Name );
@@ -73,7 +73,7 @@ namespace System.Tasks {
                 case State.None:
                     break;
                 case State.running:
-                    for (int i = 0; i < 7; i++) {
+                    for (var i = 0; i < 7; i++) {
                         Msg += i == id ? "*" : " ";
                     }
                     Console.ForegroundColor = ConsoleColor.Cyan;

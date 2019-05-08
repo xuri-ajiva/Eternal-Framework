@@ -1,25 +1,22 @@
-﻿using Eternal.Ai.Modle;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Eternal.Ai.Modle;
 
 namespace Eternal.Ai {
-    public class AIMasterInt64 : EternalFramework.Eternal {
-        public MInt64[] modleList;
-        private DateTime ts;
+    public class AiMasterInt64 : EternalFramework.Eternal {
+        public MInt64[] ModleList;
+        private DateTime _ts;
 
-        public AIMasterInt64(MInt64[] modles) : base() {
-            ts = DateTime.Now;
-            modleList = modles;
+        public AiMasterInt64(MInt64[] modles)
+        {
+            _ts = DateTime.Now;
+            ModleList = modles;
         }
-        private static MInt64 init(MInt64 m) {
+        private static MInt64 Init(MInt64 m) {
             m.init = true;
             return m;
         }
-        public void trainloop(MInt64 m, long oSetMin, long oSetMax, bool output = true) {
-            ts = DateTime.Now;
+        public void Trainloop(MInt64 m, long oSetMin, long oSetMax, bool output = true) {
+            _ts = DateTime.Now;
             while (!Train( m, oSetMin, oSetMax, output )) {
 
             }
@@ -27,70 +24,71 @@ namespace Eternal.Ai {
 
         public bool Train(MInt64 m, long oSetMin, long oSetMax, bool output = true) {
             if (m.doubs) {
-                if (m.w == 0) {
-                    if (m.addition) {
-                        m.w = oSetMin;
+                if (m.W == 0) {
+                    if (m.Addition) {
+                        m.W = oSetMin;
                     } else {
-                        m.w = -oSetMin;
+                        m.W = -oSetMin;
                     }
                 }
 
-                long prev = (long) m.Variable;
+                var prev = (long) m.Variable;
 
-                m.Longs[m.currentIndex] += m.w;
-                m.algo( m, output );
+                m.Longs[m.CurrentIndex] += m.W;
+                m.Algo( m, output );
 
-                if (m.Variable > m.Ziehl && m.Variable < prev) { m.addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
-                    m.addition = !m.addition;
-                } else if (m.Variable < m.Ziehl && m.Variable > prev) { m.addition = true; }
-                m.w = 0;
+                if (m.Variable > m.Ziehl && m.Variable < prev) { m.Addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
+                    m.Addition = !m.Addition;
+                } else if (m.Variable < m.Ziehl && m.Variable > prev) { m.Addition = true; }
+                m.W = 0;
 
-                if (m.Variable < m.Ziehl + m.tolleranz && m.Variable > m.Ziehl - m.tolleranz) {
+                if (m.Variable < m.Ziehl + m.Tolleranz && m.Variable > m.Ziehl - m.Tolleranz) {
                     Finished( m );
                     return true;
                 }
                 if (prev == m.Variable) {
-                    m.w += m.addition ? oSetMax : -oSetMin;
+                    m.W += m.Addition ? oSetMax : -oSetMin;
                 }
                 if (output)
-                    Console.WriteLine( $"ONext:{m.w}, prew:{prev}, post:{m.Variable}, tolleranz:{m.tolleranz}" );
-                m.round += 1;
+                    Console.WriteLine( $"ONext:{m.W}, prew:{prev}, post:{m.Variable}, tolleranz:{m.Tolleranz}" );
+                m.Round += 1;
             }
-            if (m.round == 10) {
-                m.currentIndex += 1;
-                if (m.currentIndex >= m.Longs.Length) {
-                    m.currentIndex = 0;
+            if (m.Round == 10) {
+                m.CurrentIndex += 1;
+                if (m.CurrentIndex >= m.Longs.Length) {
+                    m.CurrentIndex = 0;
                 }
             }
-            if (m.round > 20) {
-                m.round = 0;
+            if (m.Round > 20) {
+                m.Round = 0;
             }
 
             return false;
         }
 
         private void Finished(MInt64 m) {
-            Console.Write( "Finished in " + ( DateTime.Now - ts ) + $" Final Vaule:{m.Variable}, FInal Longs:" );
-            for (int i = 0; i < m.length; i++) {
+            Console.Write( "Finished in " + ( DateTime.Now - _ts ) + $" Final Vaule:{m.Variable}, FInal Longs:" );
+            for (var i = 0; i < m.Length; i++) {
                 Console.Write( $"doubs[{i}]: {m.Doubles[i]}, " );
             }
             Console.WriteLine();
         }
     }
-    public class AIMasterDouble : EternalFramework.Eternal {
-        public MDouble[] modleList;
-        private DateTime ts;
+    public class AiMasterDouble : EternalFramework.Eternal {
+        public MDouble[] ModleList;
+        private DateTime _ts;
 
-        public AIMasterDouble(MDouble[] modles) : base() {
-            ts = DateTime.Now;
-            modleList = modles;
+        public AiMasterDouble(MDouble[] modles)
+        {
+            _ts = DateTime.Now;
+            ModleList = modles;
         }
-        private static MDouble init(MDouble m) {
+        private static MDouble Init(MDouble m) {
             m.init = true;
             return m;
         }
-        public void trainloop(MDouble m, double oSetMin, double oSetMax, bool output = true) {
-            ts = DateTime.Now;
+        public void Trainloop(MDouble m, double oSetMin, double oSetMax, bool output = true) {
+            _ts = DateTime.Now;
             while (!Train( m, oSetMin, oSetMax, output )) {
 
             }
@@ -98,51 +96,51 @@ namespace Eternal.Ai {
 
         public bool Train(MDouble m, double oSetMin, double oSetMax, bool output = true) {
             if (m.doubs) {
-                if (m.w == 0) {
-                    if (m.addition) {
-                        m.w = oSetMin;
+                if (m.W == 0) {
+                    if (m.Addition) {
+                        m.W = oSetMin;
                     } else {
-                        m.w = -oSetMin;
+                        m.W = -oSetMin;
                     }
                 }
 
-                double prev = m.Variable;
+                var prev = m.Variable;
 
-                m.Doubles[m.currentIndex] += m.w;
-                m.algo( m, output );
+                m.Doubles[m.CurrentIndex] += m.W;
+                m.Algo( m, output );
 
-                if (m.Variable > m.Ziehl && m.Variable < prev) { m.addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
-                    m.addition = !m.addition;
-                } else if (m.Variable < m.Ziehl && m.Variable > prev) { m.addition = true; }
-                m.w = 0;
+                if (m.Variable > m.Ziehl && m.Variable < prev) { m.Addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
+                    m.Addition = !m.Addition;
+                } else if (m.Variable < m.Ziehl && m.Variable > prev) { m.Addition = true; }
+                m.W = 0;
 
-                if (m.Variable < m.Ziehl + m.tolleranz && m.Variable > m.Ziehl - m.tolleranz) {
+                if (m.Variable < m.Ziehl + m.Tolleranz && m.Variable > m.Ziehl - m.Tolleranz) {
                     Finished( m );
                     return true;
                 }
                 if (prev == m.Variable) {
-                    m.w += m.addition ? oSetMax : -oSetMin;
+                    m.W += m.Addition ? oSetMax : -oSetMin;
                 }
                 if (output)
-                    Console.WriteLine( $"ONext:{m.w}, prew:{prev}, post:{m.Variable}, tolleranz:{m.tolleranz}" );
-                m.round += 1;
+                    Console.WriteLine( $"ONext:{m.W}, prew:{prev}, post:{m.Variable}, tolleranz:{m.Tolleranz}" );
+                m.Round += 1;
             }
-            if (m.round == 10) {
-                m.currentIndex += 1;
-                if (m.currentIndex >= m.Doubles.Length) {
-                    m.currentIndex = 0;
+            if (m.Round == 10) {
+                m.CurrentIndex += 1;
+                if (m.CurrentIndex >= m.Doubles.Length) {
+                    m.CurrentIndex = 0;
                 }
             }
-            if (m.round > 20) {
-                m.round = 0;
+            if (m.Round > 20) {
+                m.Round = 0;
             }
 
             return false;
         }
 
         private void Finished(MDouble m) {
-            Console.Write( "Finished in " + ( DateTime.Now - ts ) + $" Final Vaule:{m.Variable}, FInal Longs:" );
-            for (int i = 0; i < m.length; i++) {
+            Console.Write( "Finished in " + ( DateTime.Now - _ts ) + $" Final Vaule:{m.Variable}, FInal Longs:" );
+            for (var i = 0; i < m.Length; i++) {
                 Console.Write( $"doubs[{i}]: {m.Doubles[i]}, " );
             }
             Console.WriteLine( "      " );
@@ -153,58 +151,68 @@ namespace Eternal.Ai {
 namespace Eternal.Ai.Modle {
 
     public class MInt64 : Base {
-        public long w = 0;
-        public long length { get; private set; }
+        public long W;
+        public long Length { get; private set; }
 
-        private long _Vaule = -1;
-        public long Vaule { get { if (!isOnVaule) { return _Vaule; } else { return -1; } } private set => _Vaule = value; }
-        public bool isOnVaule { get; private set; }
+        private long _vaule = -1;
+        public long Vaule { get
+        {
+            if (!IsOnVaule) { return _vaule; }
 
-        public int currentIndex { get; set; }
-        public Action<MInt64, bool> algo;
-        public bool addition = true;
-        public int round = 0;
+            return -1;
+        } private set => _vaule = value; }
+        public bool IsOnVaule { get; private set; }
 
-        public long tolleranz = 0;
+        public int CurrentIndex { get; set; }
+        public Action<MInt64, bool> Algo;
+        public bool Addition = true;
+        public int Round;
 
-        public MInt64(int Ziehlwert, int startwert, long[] _long, Action<MInt64, bool> algos, long _tolleranz = 0) : base( Ziehlwert, startwert, null, null, null, _long ) {
-            tolleranz = _tolleranz;
-            algo = algos;
+        public long Tolleranz;
 
-            length = _long.Length;
-            if (length == 1) {
-                isOnVaule = true;
+        public MInt64(int ziehlwert, int startwert, long[] _long, Action<MInt64, bool> algos, long tolleranz = 0) : base( ziehlwert, startwert, null, null, null, _long ) {
+            Tolleranz = tolleranz;
+            Algo = algos;
+
+            Length = _long.Length;
+            if (Length == 1) {
+                IsOnVaule = true;
                 Vaule = _long[0];
             }
-            currentIndex = 0;
+            CurrentIndex = 0;
 
         }
     }
     public class MDouble : Base {
-        public double w = 0;
-        public int length { get; private set; }
+        public double W;
+        public int Length { get; private set; }
 
-        private double _Vaule = -1;
-        public double Vaule { get { if (!isOnVaule) { return _Vaule; } else { return -1; } } private set => _Vaule = value; }
-        public bool isOnVaule { get; private set; }
+        private double _vaule = -1;
+        public double Vaule { get
+        {
+            if (!IsOnVaule) { return _vaule; }
 
-        public int currentIndex { get; set; }
-        public Action<MDouble, bool> algo;
-        public bool addition = true;
-        public int round = 0;
+            return -1;
+        } private set => _vaule = value; }
+        public bool IsOnVaule { get; private set; }
 
-        public double tolleranz = 0;
+        public int CurrentIndex { get; set; }
+        public Action<MDouble, bool> Algo;
+        public bool Addition = true;
+        public int Round;
 
-        public MDouble(int Ziehlwert, int startwert, double[] _doubs, Action<MDouble, bool> algos, double _tolleranz = 0) : base( Ziehlwert, startwert, null, _doubs, null, null ) {
-            tolleranz = _tolleranz;
-            algo = algos;
+        public double Tolleranz;
 
-            length = _doubs.Length;
-            if (length == 1) {
-                isOnVaule = true;
-                Vaule = _doubs[0];
+        public MDouble(int ziehlwert, int startwert, double[] doubs, Action<MDouble, bool> algos, double tolleranz = 0) : base( ziehlwert, startwert, null, doubs, null, null ) {
+            Tolleranz = tolleranz;
+            Algo = algos;
+
+            Length = doubs.Length;
+            if (Length == 1) {
+                IsOnVaule = true;
+                Vaule = doubs[0];
             }
-            currentIndex = 0;
+            CurrentIndex = 0;
 
         }
     }
@@ -214,16 +222,16 @@ namespace Eternal.Ai.Modle {
         public virtual void OnMainDouble(MDouble m, bool ausgabe = false) { }
     }
     public class Base : EternalFramework.Eternal {
-        public bool init = false;
+        public bool init;
 
         public int[] Integers;
-        private double[] Doubles_;
+        private double[] _doubles;
 
         public double[] Doubles {
-            get => Doubles_;
+            get => _doubles;
             set =>
                 //Console.WriteLine("             set             ");
-                Doubles_ = value;
+                _doubles = value;
         }
 
         public string[] Strings;
@@ -234,17 +242,18 @@ namespace Eternal.Ai.Modle {
         public bool doubs = true;
         public bool longs = true;
 
-        private double _Variable;
+        private double _variable;
         public double Variable {
-            get => _Variable;
-            set => _Variable = value;
+            get => _variable;
+            set => _variable = value;
         }
 
         public int Ziehl { get; private set; }
 
-        public Base(int Ziehlwert, int startwert, int[] _ints, double[] _doub, string[] _str, long[] _long) : base() {
+        public Base(int ziehlwert, int startwert, int[] _ints, double[] _doub, string[] _str, long[] _long)
+        {
             Variable = startwert;
-            Ziehl = Ziehlwert;
+            Ziehl = ziehlwert;
 
             if (_ints != null) {
                 Integers = _ints;

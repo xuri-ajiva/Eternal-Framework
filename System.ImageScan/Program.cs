@@ -40,7 +40,7 @@ namespace System.ImageScan {
             var bitmapData = bitmap.LockBits( new Rectangle( 0, 0, bitmap.Width, bitmap.Height ), ImageLockMode.ReadOnly,
                 PixelFormat.Format32bppArgb );
 
-            for (int y = 0; y < bitmap.Height; ++y) {
+            for (var y = 0; y < bitmap.Height; ++y) {
                 result[y] = new int[bitmap.Width];
                 Runtime.InteropServices.Marshal.Copy( bitmapData.Scan0 + y * bitmapData.Stride, result[y], 0, result[y].Length );
             }
@@ -63,7 +63,7 @@ namespace System.ImageScan {
         }
 
         private bool ContainSameElements(int[] first, int firstStart, int[] second, int secondStart, int length, int toleranz = 0) {
-            for (int i = 0; i < length; ++i) {
+            for (var i = 0; i < length; ++i) {
                 if (Math.Abs( first[i + firstStart] - second[i + secondStart] ) > toleranz) {
                     return false;
                 }
@@ -73,7 +73,7 @@ namespace System.ImageScan {
 
         private bool IsNeedlePresentAtLocation(int[][] haystack, int[][] needle, Point point, int alreadyVerified, int toleranz = 0) {
             //we already know that "alreadyVerified" lines already match, so skip them
-            for (int y = alreadyVerified; y < needle.Length; ++y) {
+            for (var y = alreadyVerified; y < needle.Length; ++y) {
                 if (!ContainSameElements( haystack[y + point.Y], point.X, needle[y], 0, needle.Length, toleranz )) {
                     return false;
                 }
@@ -104,27 +104,27 @@ namespace System.ImageScan {
         }
 
         public string SertchImageWithInfo(Bitmap _Sertchin, Bitmap _Sertchfor, ImageScanMethode imageScanMethode, int toleranz = 0, bool jointhread = true) {
-            bool __r = false;
+            var __r = false;
             TimeSpan __TimeSpan;
-            Point Point = new Point( 0, 0 );
+            var Point = new Point( 0, 0 );
 
             return SertchImageWithInfo( _Sertchin, _Sertchfor, out __r, out Point, out __TimeSpan, imageScanMethode, toleranz, jointhread );
         }
 
         public string SertchImageWithInfo(Bitmap _Sertchfor, ImageScanMethode imageScanMethode, int toleranz = 0, bool jointhread = true) {
-            bool __r = false;
+            var __r = false;
             TimeSpan __TimeSpan;
-            Point Point = new Point( 0, 0 );
+            var Point = new Point( 0, 0 );
 
             return SertchImageWithInfo( CaptureScreen(), _Sertchfor, out __r, out Point, out __TimeSpan, imageScanMethode, toleranz, jointhread );
         }
 
         public string SertchImageWithInfo(Bitmap _Sertchin, Bitmap _Sertchfor, out bool _R, out Point point, out TimeSpan _TimeSpan, ImageScanMethode imageScanMethode, int toleranz = 0, bool jointhread = true) {
-            bool __r = false;
-            TimeSpan __TimeSpan = TimeSpan.MinValue;
-            Point Point = new Point( 0, 0 );
+            var __r = false;
+            var __TimeSpan = TimeSpan.MinValue;
+            var Point = new Point( 0, 0 );
 
-            Thread t = new Threading.Thread( () => _Thread( _Sertchin, _Sertchfor, out __r, out Point, out __TimeSpan, imageScanMethode, toleranz ) );
+            var t = new Threading.Thread( () => _Thread( _Sertchin, _Sertchfor, out __r, out Point, out __TimeSpan, imageScanMethode, toleranz ) );
             t.Start();
             if (jointhread)
                 t.Join();
@@ -136,20 +136,20 @@ namespace System.ImageScan {
         }
 
         public Point?[] SertchImagesOnScreen(Bitmap[] _Sertchfor, out string result, out TimeSpan _TimeSpan, ImageScanMethode imageScanMethode, int toleranz = 0, bool jointhread = true) {
-            int f = 0;
-            int a = _Sertchfor.Length;
-            bool __r = false;
-            TimeSpan __TimeSpan = TimeSpan.MinValue;
-            Point point = new Point( 0, 0 );
+            var f = 0;
+            var a = _Sertchfor.Length;
+            var __r = false;
+            var __TimeSpan = TimeSpan.MinValue;
+            var point = new Point( 0, 0 );
             var _Sertchin = CaptureScreen();
 
-            Point?[] Presults = new Point?[a];
+            var Presults = new Point?[a];
 
-            for (int i = 0; i < a; i++) {
+            for (var i = 0; i < a; i++) {
                 point = Point.Empty;
                 Presults[i] = Point.Empty;
 
-                Thread t = new Thread( () => _Thread( _Sertchin, _Sertchfor[i], out __r, out point, out __TimeSpan, imageScanMethode, toleranz ) );
+                var t = new Thread( () => _Thread( _Sertchin, _Sertchfor[i], out __r, out point, out __TimeSpan, imageScanMethode, toleranz ) );
                 t.Start();
                 t.Join();
                 if (point != Point.Empty && point != new Point( 0, 0 )) {
@@ -166,9 +166,9 @@ namespace System.ImageScan {
         }
 
         public bool SertchImage(Bitmap _Sertchin, Bitmap _Sertchfor, ImageScanMethode imageScanMethode, int toleranz = 0, bool jointhread = true) {
-            bool __r = false;
+            var __r = false;
             TimeSpan __TimeSpan;
-            Point Point = new Point( 0, 0 );
+            var Point = new Point( 0, 0 );
 
             SertchImageWithInfo( _Sertchin, _Sertchfor, out __r, out Point, out __TimeSpan, imageScanMethode, toleranz, jointhread );
 

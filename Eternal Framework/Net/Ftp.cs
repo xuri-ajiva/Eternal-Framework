@@ -1,72 +1,67 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Eternal.Net {
-    class Ftp {
-    }
     public class FtpClinet : EternalFramework.Eternal {
 
-        public string _message;
-        public string _Name;
-        public string _Base64Password;
-        public string _File;
-        public string _FtpAddres;
-        public int _BufferLength;
+        public string Message;
+        public string Name;
+        public string Base64Password;
+        public string File;
+        public string FtpAddres;
+        public int BufferLength;
 
-        public FtpClinet(string FtpAddres, string Name, string Base64Password, string file, int BufferLength) : base() {
-            _BufferLength = BufferLength;
-            _Name = Name;
-            _FtpAddres = FtpAddres;
-            _File = file;
-            _Base64Password = Base64Password;
+        public FtpClinet(string ftpAddres, string name, string base64Password, string file, int bufferLength)
+        {
+            BufferLength = bufferLength;
+            Name = name;
+            FtpAddres = ftpAddres;
+            File = file;
+            Base64Password = base64Password;
         }
-        public void upload() {
-            upload( _FtpAddres, _Name, _Base64Password, _File, _BufferLength );
+        public void Upload() {
+            Upload( FtpAddres, Name, Base64Password, File, BufferLength );
         }
-        public void upload(string FtpAddres, string Name, string Base64Password, string file, int BufferLength) {
-            int currentpos = Console.CursorLeft;
-            _message = "Uploadeding... ";
+        public void Upload(string ftpAddres, string name, string base64Password, string file, int bufferLength) {
+            Message = "Uploadeding... ";
             var dt = DateTime.Now;
-            FtpWebRequest request =
-    (FtpWebRequest) WebRequest.Create( FtpAddres );
-            request.Credentials = new NetworkCredential( Name, Encoding.UTF8.GetString( Convert.FromBase64String( Base64Password ) ) );
+            var request =
+    (FtpWebRequest) WebRequest.Create( ftpAddres );
+            request.Credentials = new NetworkCredential( name, Encoding.UTF8.GetString( Convert.FromBase64String( base64Password ) ) );
             request.Method = WebRequestMethods.Ftp.UploadFile;
 
-            using (Stream fileStream = File.OpenRead( file ))
-            using (Stream ftpStream = request.GetRequestStream()) {
-                byte[] buffer = new byte[BufferLength];
+            using (Stream fileStream = System.IO.File.OpenRead( file ))
+            using (var ftpStream = request.GetRequestStream()) {
+                var buffer = new byte[bufferLength];
                 int read;
                 while (( read = fileStream.Read( buffer, 0, buffer.Length ) ) > 0) {
                     ftpStream.Write( buffer, 0, read );
 
 
-                    _message = "Uploaded " + fileStream.Position + " bytes";
+                    Message = "Uploaded " + fileStream.Position + " bytes";
                 }
             }
-            _message = $"Finished in {( DateTime.Now - dt )}!";
+            Message = $"Finished in {( DateTime.Now - dt )}!";
         }
-        public void download() {
-            download( _FtpAddres, _Name, _Base64Password, _File, _BufferLength );
+        public void Download() {
+            Download( FtpAddres, Name, Base64Password, File, BufferLength );
         }
-        public void download(string FtpAddres, string Name, string Base64Password, string file, int BufferLength) {
-            int currentpos = Console.CursorLeft;
+        public void Download(string ftpAddres, string name, string base64Password, string file, int bufferLength) {
+            var currentpos = Console.CursorLeft;
             Console.Write( "Downloaded " );
             var dt = DateTime.Now;
-            FtpWebRequest request =
-    (FtpWebRequest) WebRequest.Create( FtpAddres );
-            request.Credentials = new NetworkCredential( Name, Encoding.UTF8.GetString( Convert.FromBase64String( Base64Password ) ) );
+            var request =
+    (FtpWebRequest) WebRequest.Create( ftpAddres );
+            request.Credentials = new NetworkCredential( name, Encoding.UTF8.GetString( Convert.FromBase64String( base64Password ) ) );
             request.Method = WebRequestMethods.Ftp.DownloadFile;
 
-            using (Stream ftpStream = request.GetResponse().GetResponseStream())
-            using (Stream fileStream = File.Create( file )) {
-                byte[] buffer = new byte[BufferLength];
+            using (var ftpStream = request.GetResponse().GetResponseStream())
+            using (Stream fileStream = System.IO.File.Create( file )) {
+                var buffer = new byte[bufferLength];
                 int read;
-                while (( read = ftpStream.Read( buffer, 0, buffer.Length ) ) > 0) {
+                while (ftpStream != null && ( read = ftpStream.Read( buffer, 0, buffer.Length ) ) > 0) {
                     fileStream.Write( buffer, 0, read );
                     Console.SetCursorPosition( currentpos + 11, Console.CursorTop );
                     Console.Write( "                                " );

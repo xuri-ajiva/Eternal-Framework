@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Eternal.Visualisation {
    public class TaskInfo : EternalFramework.Eternal {
@@ -20,92 +16,90 @@ namespace Eternal.Visualisation {
         }
         public State _State = State.None;
         public ConsoleColor _NormalClolor = ConsoleColor.White;
-        int id = 0;
-        public bool IsRunning = false;
+        private int _id;
+        public bool IsRunning;
 
-        private Thread _Thread;
-        private Action _run;
+        private Thread _thread;
+        private readonly Action _run;
 
-        public TaskInfo(string Name, Action run, ConsoleColor NormalColor = ConsoleColor.White) : base() {
+        public TaskInfo(string Name, Action run, ConsoleColor NormalColor = ConsoleColor.White)
+        {
             _Name = Name;
             _NormalClolor = NormalColor;
             _run = run;
-            _Thread = new Thread( () => {
+            _thread = new Thread( () => {
                 while (true) {
                     Thread.Sleep( 150 );
                     if (IsRunning)
                         Writestate();
                 }
             } );
-            _Thread.Start();
+            _thread.Start();
         }
-        private int line = 0;
+        private int _line;
         public virtual void Run(bool startgivenvoid = true) {
             Console.ForegroundColor = _NormalClolor;
-            line = Console.CursorTop;
+            _line = Console.CursorTop;
             Console.Write( "[       ]: " + _Name );
             IsRunning = true;
 
-            if (startgivenvoid) {
-                _run();
-                IsRunning = false;
-                Writestate();
-            }
+            if (!startgivenvoid) return;
+            _run();
+            IsRunning = false;
+            Writestate();
         }
         public virtual void Abort() {
-            _Thread.Abort();
+            _thread.Abort();
             IsRunning = false;
             _Guid = Guid.Empty;
             _Name = string.Empty;
-            _Thread = null;
+            _thread = null;
             _State = State.None;
         }
         public void Writestate() {
 
-            string Msg = "";
+            var msg = "";
 
-            Console.SetCursorPosition( 0, line );
+            Console.SetCursorPosition( 0, _line );
             Console.Write( "[       ]: " + _Name );
-            Console.SetCursorPosition( 1, line );
+            Console.SetCursorPosition( 1, _line );
 
             switch (_State) {
                 case State.None:
                     break;
                 case State.running:
-                    for (int i = 0; i < 7; i++) {
-                        Msg += i == id ? "*" : " ";
+                    for (var i = 0; i < 7; i++) {
+                        msg += i == _id ? "*" : " ";
                     }
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    id++;
-                    if (id >= 7)
-                        id = 0;
+                    _id++;
+                    if (_id >= 7)
+                        _id = 0;
                     break;
                 case State.ok:
-                    Msg = ( "  OK!  " );
+                    msg = ( "  OK!  " );
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                     break;
                 case State.fail:
-                    Msg = ( " faile " );
+                    msg = ( " fai" + "le " );
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     break;
                 case State.error:
-                    Msg = ( " Error " );
+                    msg = ( " Error " );
                     Console.ForegroundColor = ConsoleColor.Red;
                     break;
                 case State.warning:
-                    Msg = ( "Warning" );
+                    msg = ( "Warning" );
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
                     break;
                 case State.critical:
                     Console.Beep( 2048, 100 );
-                    Msg = ( "*Error*" );
+                    msg = ( "*Error*" );
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                    break;
-                default:
                     break;
             }
 
-            Console.Write( Msg );
+            Console.Write( msg );
             Console.ForegroundColor = _NormalClolor;
         }
         public bool Equals(TaskInfo t1, TaskInfo t2) {

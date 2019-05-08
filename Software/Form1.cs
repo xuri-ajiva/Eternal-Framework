@@ -44,10 +44,10 @@ namespace Software
             openFileDialog1.Multiselect = true;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                string args = "u ";
+                var args = "u ";
                 foreach (var o in openFileDialog1.FileNames)
                 {
-                    Process p = new Process();
+                    var p = new Process();
                     p.StartInfo = new ProcessStartInfo("container.exe", args + o);
                     p.Start();
                     p.WaitForExit();
@@ -59,13 +59,13 @@ namespace Software
         {
             if (MessageBox.Show("   Sicher das sie fortfahren wollen?") == DialogResult.OK)
             {
-                string args = "p ";
+                var args = "p ";
                 foreach (ListViewItem o in listView1.Items)
                 {
                     args += o.Text + " ";
                 }
 
-                Process p = new Process();
+                var p = new Process();
                 p.StartInfo = new ProcessStartInfo("container.exe", args);
                 p.Start();
                 p.WaitForExit();

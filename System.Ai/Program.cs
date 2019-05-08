@@ -37,7 +37,7 @@ namespace System.Ai {
                     }
                 }
 
-                long prev = (long) m.Variable;
+                var prev = (long) m.Variable;
 
                 m.Longs[m.currentIndex] += m.w;
                 m.algo.OnMainInt64( m );
@@ -73,7 +73,7 @@ namespace System.Ai {
 
         private void Finished(MInt64 m) {
             Console.Write( "Finished in " + ( DateTime.Now - ts ) + $" Final Vaule:{m.Variable}, FInal Longs:" );
-            for (int i = 0; i < m.length; i++) {
+            for (var i = 0; i < m.length; i++) {
                 Console.Write( $"doubs[{i}]: {m.Doubles[i]}, " );
             }
             Console.WriteLine();
@@ -108,7 +108,7 @@ namespace System.Ai {
                     }
                 }
 
-                double prev = m.Variable;
+                var prev = m.Variable;
 
                 m.Doubles[m.currentIndex] += m.w;
                 m.algo( m, output );
@@ -144,7 +144,7 @@ namespace System.Ai {
 
         private void Finished(MDouble m) {
             Console.Write( "Finished in " + ( DateTime.Now - ts ) + $" Final Vaule:{m.Variable}, FInal Longs:" );
-            for (int i = 0; i < m.length; i++) {
+            for (var i = 0; i < m.length; i++) {
                 Console.Write( $"doubs[{i}]: {m.Doubles[i]}, " );
             }
             Console.WriteLine( "      " );
