@@ -121,7 +121,7 @@ namespace testbuilds {
             double cash = 100;
             var i = 0;
 
-            while (cash <= 0 && bank > 0) {
+            while (cash >= 0 && bank > 0) {
                 var g = r.Next( 0, 100 );
 
                 cash -= 2;
@@ -159,7 +159,7 @@ namespace testbuilds {
 
             Console.WriteLine( "-----------------SETUP----------------" );
             var t = DateTime.Now;
-            SetAlgorythmos( 22, 13, 5, 3 );
+            SetAlgorythmos( 20, 10, 5, 3 );
             _m = new MDouble( 1000, 0, _lo, SlotAutomatAlgo, 90 );
             _ai = new AiMasterDouble( new[] { _m } );
             Console.WriteLine( _m.GetId );

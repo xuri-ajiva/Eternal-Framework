@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Eternal.Ai.Modle;
 
 namespace Eternal.Ai {

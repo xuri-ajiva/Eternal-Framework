@@ -2,18 +2,21 @@
 
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
+
 namespace EternalFramework {
+
+    [Guid( "894843E4-40F0-4A79-B923-1DF5B8A2EAE4" )]
     public class EternalMain {
         private readonly Guid _guid = Guid.NewGuid();
         private static bool _used;
         private static readonly string EndodetSplash = Eternal.privatevar.privatestaff.buildbase64();
 
-
-
         public const string SoftwareName = "EternalMain";
+
         public EternalMain() {
 #if DEBUG
             var c = Console.ForegroundColor;
@@ -46,7 +49,7 @@ namespace EternalFramework {
         public EternalMain(int id) {
             WriteSplash();
 
-            Thread t = new Thread( () => { while (true) try { Console.SetBufferSize( Console.WindowWidth, Console.WindowHeight ); } catch {/* ignored*/} } );
+            var t = new Thread( () => { while (true) try { Console.SetBufferSize( Console.WindowWidth, Console.WindowHeight ); } catch {/* ignored*/} } );
             //t.Start();
         }
 
@@ -110,4 +113,6 @@ namespace EternalFramework {
 
         public string GetId => _guid.ToString();
     }
+    
+
 }
