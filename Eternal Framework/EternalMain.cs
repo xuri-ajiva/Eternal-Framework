@@ -106,13 +106,13 @@ namespace EternalFramework {
             Thread.Sleep( 2000 );
             Console.Clear();
             Console.SetWindowSize( cs.Width, cs.Height );
-            Console.SetBufferSize( cs.Width, cs.Height );
+            Console.SetBufferSize( cs.Width, 9999 );
 
             Console.ForegroundColor = c;
         }
 
         public string GetId => _guid.ToString();
     }
-    
+
 
 }

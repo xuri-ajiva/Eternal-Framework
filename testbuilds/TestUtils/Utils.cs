@@ -10,8 +10,11 @@ namespace testbuilds.TestUtils {
             for (var i = 0; i < choises.Length; i++) {
                 Console.WriteLine( $"[{i}]: {choises[i]._Name}" );
             }
-            Console.WriteLine( "Bitte Wählen" );
-            choises[int.Parse( Console.ReadLine() )].Avtivete();
+            var v = 0;
+            while (!int.TryParse( Console.ReadLine(), out v )) {
+                Console.Write( "Bitte Wählen[0 - " + choises.Length + "]:" );
+            }
+            choises[v].Avtivete();
         }
     }
     public class ChoisObjekts {

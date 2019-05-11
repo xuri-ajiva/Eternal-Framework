@@ -38,6 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,8 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ai\Basic.cs" />
+    <Compile Include="Ai\stats.cs" />
     <Compile Include="Drawing\ImageSearch.cs" />
     <Compile Include="EternalMain.cs" />
+    <Compile Include="MathE\Complex.cs" />
     <Compile Include="Net\Ftp.cs" />
     <Compile Include="privatevar\privatestaff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

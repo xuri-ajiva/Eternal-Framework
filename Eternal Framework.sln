@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "formstest", "formstest\form
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "overlaytests", "overlaytests\overlaytests.csproj", "{90C126B3-5C74-433F-B9E9-CC0491D1EBC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wptests", "Wptests\Wptests.csproj", "{0EF95FE6-0490-4E0D-A896-21788B9605B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{90C126B3-5C74-433F-B9E9-CC0491D1EBC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90C126B3-5C74-433F-B9E9-CC0491D1EBC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90C126B3-5C74-433F-B9E9-CC0491D1EBC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EF95FE6-0490-4E0D-A896-21788B9605B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EF95FE6-0490-4E0D-A896-21788B9605B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EF95FE6-0490-4E0D-A896-21788B9605B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EF95FE6-0490-4E0D-A896-21788B9605B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

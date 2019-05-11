@@ -1,0 +1,16 @@
+﻿<Window x:Class="Wptests.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wptests"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+
+        <Viewport3D x:Name="v3d" HorizontalAlignment="Left" Height="360.19" Margin="21.27,48.81,0,0" VerticalAlignment="Top" Width="760.73"/>
+        <Button x:Name="b1" Content="Button" HorizontalAlignment="Left" Height="33.81" Margin="21.27,10,0,0" VerticalAlignment="Top" Width="101.08" Click="B1_Click"/>
+        <Viewport3D HorizontalAlignment="Left" Height="100" Margin="169.002,24.512,0,0" VerticalAlignment="Top" Width="100"/>
+
+    </Grid>
+</Window>

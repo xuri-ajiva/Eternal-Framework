@@ -23,10 +23,47 @@ namespace overlaytests {
             IUPDATE = false;
 
             Thread t = new Thread( () => ThreasStart() );
-            t.Start();
+            //t.Start();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault( false );
+
+            int whide = 400;
+            int heigth = 400;
+
+            int iterations = 255;
+            int oSet = 100;
+
+            for (int i = 0; i < whide; i++) {
+                for (int j = 0; j < heigth; j++) {
+
+                    double a = (double)( i - ( whide / 2 ) ) / (double) ( (double) whide / 4 );
+                    double b = (double)( j - ( heigth / 2 ) ) / (double) ( (double) heigth / 4 );
+                    complex c = new complex( a, b );
+                    complex z = new complex( 0, 0 );
+
+                    int it = 0;
+
+                    do {
+                        it++;
+                        z.Square();
+                        z.Add( c );
+                        if (z.Magnitude() > 2.0) break;
+                    } while (it < iterations);
+                    
+                    Color color = Color.FromArgb( 255, it, it, it );
+
+                    //color = it < iterations ? Color.Black : Color.White;
+
+                    Rectangle rec = new Rectangle( i + oSet, j + oSet, 1, 1 );
+                    Rect _rect = new Rect( rec, color, true, 0 );
+
+                    rectangles.Add( _rect );
+                }
+            }
+
+
+            IUpdat += 1000;
 
             Overlay = new Overlay();
             Application.Run( Overlay );
@@ -34,8 +71,6 @@ namespace overlaytests {
 
         private static void ThreasStart() {
             while (true) {
-                //while (IUpdat > 0)
-                //    Thread.Sleep(1);
                 if (rectangles.Count % 100 == 0)
                     Thread.Sleep( 1 );
                 var r1 = new Random();

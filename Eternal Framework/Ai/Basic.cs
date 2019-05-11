@@ -1,14 +1,19 @@
-﻿using System;
+﻿using Eternal.Ai.Modle;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Eternal.Ai.Modle;
+using System.Windows.Documents;
 
 namespace Eternal.Ai {
-    public class AiMasterInt64 : EternalFramework.EternalMain {
+    internal class AiMasterInt64 : EternalFramework.EternalMain {
         public MInt64[] ModleList;
         private DateTime _ts;
 
-        public AiMasterInt64(MInt64[] modles)
-        {
+        public AiMasterInt64(MInt64[] modles) {
             _ts = DateTime.Now;
             ModleList = modles;
         }
@@ -28,7 +33,8 @@ namespace Eternal.Ai {
                 if (m.W == 0) {
                     if (m.Addition) {
                         m.W = oSetMin;
-                    } else {
+                    }
+                    else {
                         m.W = -oSetMin;
                     }
                 }
@@ -38,9 +44,11 @@ namespace Eternal.Ai {
                 m.Longs[m.CurrentIndex] += m.W;
                 m.Algo( m, output );
 
-                if (m.Variable > m.Ziehl && m.Variable < prev) { m.Addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
+                if (m.Variable > m.Ziehl && m.Variable < prev) { m.Addition = false; }
+                else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
                     m.Addition = !m.Addition;
-                } else if (m.Variable < m.Ziehl && m.Variable > prev) { m.Addition = true; }
+                }
+                else if (m.Variable < m.Ziehl && m.Variable > prev) { m.Addition = true; }
                 m.W = 0;
 
                 if (m.Variable < m.Ziehl + m.Tolleranz && m.Variable > m.Ziehl - m.Tolleranz) {
@@ -75,12 +83,11 @@ namespace Eternal.Ai {
             Console.WriteLine();
         }
     }
-    public class AiMasterDouble : EternalFramework.EternalMain {
+    internal class AiMasterDouble : EternalFramework.EternalMain {
         public MDouble[] ModleList;
         private DateTime _ts;
 
-        public AiMasterDouble(MDouble[] modles)
-        {
+        public AiMasterDouble(MDouble[] modles) {
             _ts = DateTime.Now;
             ModleList = modles;
         }
@@ -100,7 +107,8 @@ namespace Eternal.Ai {
                 if (m.W == 0) {
                     if (m.Addition) {
                         m.W = oSetMin;
-                    } else {
+                    }
+                    else {
                         m.W = -oSetMin;
                     }
                 }
@@ -110,9 +118,11 @@ namespace Eternal.Ai {
                 m.Doubles[m.CurrentIndex] += m.W;
                 m.Algo( m, output );
 
-                if (m.Variable > m.Ziehl && m.Variable < prev) { m.Addition = false; } else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
+                if (m.Variable > m.Ziehl && m.Variable < prev) { m.Addition = false; }
+                else if (( m.Variable < m.Ziehl && m.Variable < prev ) || ( m.Variable > m.Ziehl && m.Variable > prev )) {
                     m.Addition = !m.Addition;
-                } else if (m.Variable < m.Ziehl && m.Variable > prev) { m.Addition = true; }
+                }
+                else if (m.Variable < m.Ziehl && m.Variable > prev) { m.Addition = true; }
                 m.W = 0;
 
                 if (m.Variable < m.Ziehl + m.Tolleranz && m.Variable > m.Ziehl - m.Tolleranz) {
@@ -147,21 +157,219 @@ namespace Eternal.Ai {
             Console.WriteLine( "      " );
         }
     }
+
+    public class AiMasterBase : EternalFramework.EternalMain {
+        private readonly ModuleBase _curentBase;
+        private DateTime _ts;
+
+        private List<stats> _stats = new List<stats>();
+
+        public void Trainloop(bool output = true) {
+            _ts = DateTime.Now;
+            while (!Train( output )) {
+
+            }
+        }
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public bool Train(bool output = true) {
+            var @base = _curentBase;
+
+            var min = @base.MinOfset;
+            var max = @base.MaxOfset;
+
+            var Variable = @base.Variable;
+            var Thaget = @base.Thaget;
+            var Tolleranz = @base.Tolleranz;
+            try {
+
+                if (@base.NextTry == 0) {
+                    if (@base.Addition) @base.NextTry = min;
+                    else @base.NextTry = -min;
+                }
+
+                {
+                    var prev = Variable;
+
+                    @base.ToChange[@base.CurrentIndex] += @base.NextTry;
+
+                    @base.Action( _curentBase, output );
+
+                    Variable = @base.Variable;
+
+                    if (Variable > Thaget && Variable < prev) {
+                        @base.Addition = false;
+                    }
+                    else if (( Variable < Thaget && Variable < prev ) || ( Variable > Thaget && Variable > prev )) {
+                        @base.Addition = !@base.Addition;
+                    }
+                    else if (Variable < Thaget && Variable > prev) {
+                        @base.Addition = true;
+                    }
+
+                    @base.NextTry = 0;
+
+                    if (Variable < Thaget + Tolleranz && Variable > Thaget - Tolleranz) {
+                        Finished( _curentBase );
+                        return true;
+                    }
+
+                    if (prev == Variable) {
+                        @base.NextTry += @base.Addition ? max : -max;
+                    }
+
+                    if (output)
+                        Console.WriteLine($"Next:{@base.NextTry}, prew:{prev}, post:{Variable}, tolleranz:{Tolleranz}" );
+                    @base.Round += 1;
+                }
+                if (@base.Round % 20 == 10) {
+                    @base.CurrentIndex += 1;
+                    if (@base.CurrentIndex >= @base.ToChange.Length) {
+                        @base.CurrentIndex = 0;
+                    }
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine( e.Message );
+            }
+
+            return false;
+        }
+
+        private void Finished(ModuleBase @base) {
+            var ts = DateTime.Now - _ts;
+            Console.WriteLine( $"Finished in {ts}, Final Vaule:{@base.Variable}, Rounds:{@base.Round}, ToChange:" );
+            for (var i = 0; i < @base.ToChange.Length; i++) {
+                Console.WriteLine( $"[{i}]: {@base.ToChange[i]}." );
+            }
+            Console.WriteLine( "      " );
+            stats s = new stats( @base.Round, ts, @base.Variable );
+            _stats.Add( s );
+        }
+
+        public AiMasterBase(ModuleBase curentBase) {
+            _curentBase = curentBase;
+        }
+
+        public ModuleBase CurentBase => _curentBase;
+
+        public List<stats> Stats => _stats;
+    }
+
+    public class stats {
+        private int Round;
+        private TimeSpan Time;
+        private double finalvaule;
+
+        public stats(int round, TimeSpan time, double finalvaule) {
+            Round = round;
+            Time = time;
+            this.finalvaule = finalvaule;
+        }
+
+        public double Finalvaule => finalvaule;
+
+        public int Round1 => Round;
+
+        public TimeSpan Time1 => Time;
+    }
 }
 
 namespace Eternal.Ai.Modle {
 
-    public class MInt64 : Base {
+    public class ModuleBase : EternalFramework.EternalMain {
+        private bool Init;
+
+        private dynamic _variable;
+        private readonly dynamic _thaget;
+        private readonly dynamic _minOfset;
+        private readonly dynamic _maxOfset;
+
+        private dynamic[] _toChange;
+        private int _currentIndex;
+        private int _round;
+        private int _tolleranz;
+
+        private Action<ModuleBase, bool> _action;
+
+        private bool _addition = true;
+        private dynamic _nextTry;
+
+        public ModuleBase(dynamic variable, dynamic thaget, dynamic minOfset, dynamic maxOfset, dynamic[] Tochange, Action<ModuleBase, bool> action, int tolleranz) : base() {
+            Init = true;
+            _variable = variable;
+            _thaget = thaget;
+            _minOfset = minOfset;
+            _maxOfset = maxOfset;
+            _toChange = Tochange;
+            _action = action;
+            _tolleranz = tolleranz;
+            _currentIndex = 0;
+            _nextTry = 0;
+            _round = 0;
+        }
+
+        public int Tolleranz {
+            get => _tolleranz;
+            set => _tolleranz = value;
+        }
+
+        public int Round {
+            get => _round;
+            set => _round = value;
+        }
+
+        public Action<ModuleBase, bool> Action {
+            get => _action;
+            set => _action = value;
+        }
+
+        public int CurrentIndex {
+            get => _currentIndex;
+            set => _currentIndex = value;
+        }
+
+        public dynamic Variable {
+            get => _variable;
+            set => _variable = value;
+        }
+
+        public dynamic NextTry {
+            get => _nextTry;
+            set => _nextTry = value;
+        }
+
+        public dynamic[] ToChange {
+            get => _toChange;
+            set => _toChange = value;
+        }
+
+        public bool Addition {
+            get => _addition;
+            set => _addition = value;
+        }
+
+        public dynamic MaxOfset => _maxOfset;
+
+        public dynamic MinOfset => _minOfset;
+
+        public dynamic Thaget => _thaget;
+    }
+
+
+    internal class MInt64 : Base {
         public long W;
         public long Length { get; private set; }
 
         private long _vaule = -1;
-        public long Vaule { get
-        {
-            if (!IsOnVaule) { return _vaule; }
+        public long Vaule {
+            get {
+                if (!IsOnVaule) { return _vaule; }
 
-            return -1;
-        } private set => _vaule = value; }
+                return -1;
+            }
+            private set => _vaule = value;
+        }
         public bool IsOnVaule { get; private set; }
 
         public int CurrentIndex { get; set; }
@@ -184,17 +392,19 @@ namespace Eternal.Ai.Modle {
 
         }
     }
-    public class MDouble : Base {
+    internal class MDouble : Base {
         public double W;
         public int Length { get; private set; }
 
         private double _vaule = -1;
-        public double Vaule { get
-        {
-            if (!IsOnVaule) { return _vaule; }
+        public double Vaule {
+            get {
+                if (!IsOnVaule) { return _vaule; }
 
-            return -1;
-        } private set => _vaule = value; }
+                return -1;
+            }
+            private set => _vaule = value;
+        }
         public bool IsOnVaule { get; private set; }
 
         public int CurrentIndex { get; set; }
@@ -222,7 +432,7 @@ namespace Eternal.Ai.Modle {
 
         public virtual void OnMainDouble(MDouble m, bool ausgabe = false) { }
     }
-    public class Base : EternalFramework.EternalMain {
+    internal class Base : EternalFramework.EternalMain {
         public bool init;
 
         public int[] Integers;
@@ -251,34 +461,38 @@ namespace Eternal.Ai.Modle {
 
         public int Ziehl { get; private set; }
 
-        public Base(int ziehlwert, int startwert, int[] _ints, double[] _doub, string[] _str, long[] _long)
-        {
+        public Base(int ziehlwert, int startwert, int[] _ints, double[] _doub, string[] _str, long[] _long) {
             Variable = startwert;
             Ziehl = ziehlwert;
 
             if (_ints != null) {
                 Integers = _ints;
-            } else {
+            }
+            else {
                 ints = false;
             }
 
             if (_doub != null) {
                 Doubles = _doub;
-            } else {
+            }
+            else {
                 doubs = false;
             }
 
             if (_str != null) {
                 Strings = _str;
-            } else {
+            }
+            else {
                 strs = false;
             }
 
             if (_long != null) {
                 Longs = _long;
-            } else {
+            }
+            else {
                 longs = false;
             }
         }
+
     }
 }

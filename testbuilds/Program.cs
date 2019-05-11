@@ -5,6 +5,7 @@ using Eternal.Net;
 using Eternal.Utils;
 using Eternal.Visualisation;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -18,7 +19,7 @@ namespace testbuilds {
             new Program();
         }
 
-        public Program() {
+        private Program() {
             var ftp = new ChoisObjekts( "FtpTest", _Ftp );
             var ims = new ChoisObjekts( "ImageScanTest", _ImageScan );
             var ai = new ChoisObjekts( "AiTest", _Ai );
@@ -85,7 +86,8 @@ namespace testbuilds {
                         if (_ti != null) {
                             _ti._State = _state;
                             _ti._Name = _ftp.Message;
-                        } else {
+                        }
+                        else {
                             Console.SetCursorPosition( 0, Console.CursorTop );
                             Console.Write( _ftp.Message + "                      " );
                         }
@@ -96,11 +98,14 @@ namespace testbuilds {
                 up.Abort();
                 _state = TaskInfo.State.ok;
 
-            } catch (System.Net.WebException) {
+            }
+            catch (System.Net.WebException) {
                 _state = TaskInfo.State.warning;
-            } catch (IOException) {
+            }
+            catch (IOException) {
                 _state = TaskInfo.State.critical;
-            } catch (Exception) {
+            }
+            catch (Exception) {
                 _state = TaskInfo.State.fail;
             }
         }
@@ -108,117 +113,206 @@ namespace testbuilds {
 
         #region AiTests
 
-        private MDouble _m;
-        private AiMasterDouble _ai;
-        private readonly double[] _lo = new double[4];
+        private ModuleBase _module;
+        private AiMasterBase _aiMaster;
+        private readonly dynamic[] _lo = new dynamic[4];
+        private readonly RandomGenerator _r = new RandomGenerator();
+        //private readonly Random _r = new Random();
 
-        public void SetAlgorythmos(double l1, double l2, double l3, double l4) {
-            _lo[0] = l1; _lo[1] = l2; _lo[2] = l3; _lo[3] = l4;
+        private void SetAlgorythmos(double l1, double l2, double l3, double l4/*, double l5*/) {
+            _lo[0] = R( l1 ); _lo[1] = R( l2 ); _lo[2] = R( l3 ); _lo[3] = R( l4 );/* _lo[4] = r( l5 );*/
         }
-        RandomGenerator r = new RandomGenerator();
-        public void SlotAutomatAlgo(MDouble m, bool ausgabe) {
+        private void SetAlgorythmos(ModuleBase @base) {
+            SetAlgorythmos( @base.ToChange[0], @base.ToChange[1], @base.ToChange[2], @base.ToChange[3]/*, @base.ToChange[4] */);
+        }
+
+        private int _startmoney;
+        private void SlotAutomatAlgo(ModuleBase m, bool ausgabe) {
             double bank = 10000;
-            double cash = 100;
+            double cash = _startmoney;
             var i = 0;
+            var array = m.ToChange;
 
             while (cash >= 0 && bank > 0) {
-                var g = r.Next( 0, 100 );
+                var g = _r.Next( 0, 100 );
 
                 cash -= 2;
                 bank += 2;
 
                 if (g > 99) {
-                    bank -= _lo[0];
-                    cash += _lo[0];
-                } else if (g > 90) {
-                    bank -= _lo[1];
-                    cash += _lo[1];
-                } else if (g > 80) {
-                    bank -= _lo[2];
-                    cash += _lo[2];
-                } else if (g > 70) {
-                    bank -= _lo[3];
-                    cash += _lo[3];
+                    bank -= array[0];
+                    cash += array[0];
+                }
+                else if (g > 90) {
+                    bank -= array[1];
+                    cash += array[1];
+                }
+                else if (g > 80) {
+                    bank -= array[2];
+                    cash += array[2];
+                }
+                else if (g > 70) {
+                    bank -= array[3];
+                    cash += array[3];
+                }/*
+                else if (g > 65) {
+                    bank -= array[4];
+                    cash += array[4];
+                }*/
+
+                for (int j = 0; j < array.Length; j++) {
+                    array[j] = R( array[j] );
                 }
 
                 i += 1;
             }
             if (ausgabe) {
+                cash = R( cash );
+                bank = R( bank );
                 Console.WriteLine( $"[{i}]: cach:{cash}, bank:{bank}" );
             }
             m.Variable = i;
         }
 
-        private void _Ai() {
+        private double R(double d) {
+            decimal m = (decimal) d; return (double) ( Math.Truncate( m * 1000m ) / 1000m );
+        }
 
-            const int loops = 100;
+        private void _Ai() {
             const bool showOutput = false;
             const double vMin = 0.01D;
             const double vMax = 0.02D;
+
+            Console.Write( "Bitte startgeld Für Kunden Angeben:" );
+            int.TryParse( Console.ReadLine(), out _startmoney );
+            Console.Write( "Bitte anzahl der Trains angeben:" );
+            int.TryParse( Console.ReadLine(), out var loops );
+            Console.Write( "Bitte Thaget(int) angeben:" );
+            double.TryParse( Console.ReadLine(), out var thaget );
+
+            int tolleranz = (int) ( thaget / 5D );
+
             Console.WindowWidth = 153;
 
             Console.WriteLine( "-----------------SETUP----------------" );
             var t = DateTime.Now;
-            SetAlgorythmos( 20, 10, 5, 3 );
-            _m = new MDouble( 1000, 0, _lo, SlotAutomatAlgo, 90 );
-            _ai = new AiMasterDouble( new[] { _m } );
-            Console.WriteLine( _m.GetId );
+            SetAlgorythmos( 20, 11, 6, 4 );
+            _module = new ModuleBase( 0, thaget, vMin, vMax, _lo, SlotAutomatAlgo, tolleranz );
+            _aiMaster = new AiMasterBase( _module );
+            Console.WriteLine( _module.GetId );
             Console.WriteLine( "done in " + ( DateTime.Now - t ) );
+
+            Console.WriteLine( "---------------CALIBRATE--------------" );
+            t = DateTime.Now;
+            _aiMaster.Trainloop();
+            SetAlgorythmos( _module );
+            _module = new ModuleBase( 0, thaget, vMin, vMax, _lo, SlotAutomatAlgo, tolleranz * 2 );
+            Console.WriteLine( "\ndone in " + ( DateTime.Now - t ) );
+            Console.WriteLine( "---------------FINISHED---------------" );
+
             Console.WriteLine( "Press any Key to enter TrainLoop({0})...", loops );
             Console.ReadKey();
             Console.Clear();
-            for (var i = 0; i < loops; i++) {
+
+            for (var i = 1; i < loops + 1; i++) {
                 Console.SetCursorPosition( 0, 0 );
                 Console.WriteLine( "---------------TRAINING---------------" );
                 t = DateTime.Now;
-                _ai.Trainloop( _m, vMin, vMax, showOutput );
-                SetAlgorythmos( _m.Doubles[0], _m.Doubles[1], _m.Doubles[2], _m.Doubles[3] );
-                _m = new MDouble( 1000, 0, _lo, SlotAutomatAlgo, 90 );
+                _aiMaster.Trainloop( showOutput );
+                SetAlgorythmos( _module );
+                _module = new ModuleBase( 0, thaget, vMin, vMax, _lo, SlotAutomatAlgo, tolleranz );
                 Console.WriteLine( "\ndone in " + ( DateTime.Now - t ) );
-                Console.WriteLine( "---------------FINISHED---------------" + $"                                                                                                          [{ i}/{ loops}]" );
-                var v = Console.WindowWidth - 3;
-                Console.Write( "[" );
-                Console.SetCursorPosition( v + 1, Console.CursorTop );
-                Console.Write( "]" );
-                Console.SetCursorPosition( 1, Console.CursorTop );
-                for (var j = 0; j < ( i / (double) 100 ) * v; j++) {
-                    Console.Write( "=" );
-                }
-                Console.Write( ">" );
-                for (var j = i; j < ( v - ( i / (double) 100 ) * v ) - 1; j++) {
-                    Console.Write( " " );
-                }
+                Console.WriteLine( "---------------FINISHED---------------" );
+                ProgressBar( i, loops );
             }
+
+            var maxFinalVaule = 0D;
+            var maxRound = 0D;
+            var maxTs = TimeSpan.MaxValue;
+
+            foreach (var stat in _aiMaster.Stats) {
+                if (maxFinalVaule < stat.Finalvaule)
+                    maxFinalVaule = stat.Finalvaule;
+                if (maxRound < stat.Round1)
+                    maxRound = stat.Round1;
+                if (maxTs < stat.Time1)
+                    maxTs = stat.Time1;
+            }
+
+            Console.SetCursorPosition( 0, Console.CursorTop + 3 );
+            Console.WriteLine( $"MaxRound:{maxRound}\nMaxVaule:{maxFinalVaule}\nMaxTimespan:{maxTs}" );
+
             Console.WriteLine( "\n\n-------------RUNNING TESTS------------" );
             Console.WriteLine( "Press any Key..." );
             Console.ReadKey();
             t = DateTime.Now;
-            SetAlgorythmos( _m.Doubles[0], _m.Doubles[1], _m.Doubles[2], _m.Doubles[3] );
-            _m = new MDouble( 10000, 0, _lo, SlotAutomatAlgo, 1000 );
+
+
+            SetAlgorythmos( _module );
+            _module = new ModuleBase( 0, thaget, vMin, vMax, _lo, SlotAutomatAlgo, tolleranz );
+
             double max = 0;
             for (var i = 0; i < 100; i++) {
-                SlotAutomatAlgo( _m, true );
-                max = _m.Variable > max ? _m.Variable : max;
+                SlotAutomatAlgo( _module, true );
+                max = _module.Variable > max ? _module.Variable : max;
             }
+
             Console.WriteLine( $"\ndone in {DateTime.Now - t}       Max:{max}" );
             Console.WriteLine( "---------------FINISHED---------------" );
+        }
+
+        private void ProgressBar(int i, int max) {
+
+            var rundenanzeige = $"[{ i}/{ max}]";
+            var v = Console.WindowWidth - 3;
+            Console.SetCursorPosition( 1, Console.CursorTop );
+            for (var j = 0; j < ( i / (double) max ) * v; j++) {
+                Console.Write( "=" );
+            }
+            Console.Write( ">" );
+            for (var j = i; j < ( v - ( i / (double) max ) * v ) - 1; j++) {
+                Console.Write( " " );
+            }
+
+            try { Console.SetCursorPosition( 0, Console.CursorTop ); }
+            catch {
+                // ignored
+            }
+
+            Console.Write( "[" );
+            try { Console.SetCursorPosition( v + 1, Console.CursorTop ); }
+            catch {
+                // ignored
+            }
+
+            Console.Write( "]" );
+            try { Console.SetCursorPosition( ( v + 1 ) - rundenanzeige.Length, Console.CursorTop - 1 ); }
+            catch {
+                // ignored
+            }
+
+            Console.Write( rundenanzeige );
         }
         #endregion
 
         #region ImageScanTest
 
-        private readonly ImageSearch _ic = new ImageSearch();
+        ImageSearch _mainimageseatch = new ImageSearch();
         private void _ImageScan() {
             const string pathToBmp = "..\\..\\..\\example.png";
 
-            const int tolleranz = 50;
-            const ImageSearch.ImageScanMethode ism = ImageSearch.ImageScanMethode.Fast;
+            const ImageSearch.ImageSearchMethode ism = ImageSearch.ImageSearchMethode.Fast;
             Console.WriteLine( Path.GetDirectoryName( pathToBmp ) );
-            var b = new Bitmap( pathToBmp );
+
+            var imageSearch = new ImageSearch( new Bitmap( pathToBmp ), _mainimageseatch.CaptureScreen(), ism, true, 50 );
+
+            Process.Start( pathToBmp );
 
             while (true) {
-                var str = _ic.SertchImageWithInfo( _ic.CaptureScreen(), b, out _, out _, out _, ism, tolleranz );
-                Console.WriteLine( str );
+
+                imageSearch.SeatchIn( _mainimageseatch.CaptureScreen() );
+                Console.WriteLine( imageSearch.Result );
+                imageSearch.Clean();
                 Thread.Sleep( 250 );
             }
         }

@@ -9,11 +9,26 @@ using System.Threading.Tasks;
 namespace tests {
     class Program {
         static void Main(string[] args) {
+
+            new testclass<int>( 7 );
+            new testclass<double>( 8D );
+            new testclass<string>( "test" );
+
+
+            Console.ReadLine();
+            //testtask t = new testtask( "Test",ConsoleColor.Yellow );
+            //t.Run();
+            //Console.WriteLine( "E" );
+            //Console.ReadLine();
+        }
+
+        public static void consolwrite() {
+
             Console.WriteLine( Console.OutputEncoding );
             //Console.OutputEncoding = Encoding.GetEncoding( 1252 );
             Console.WriteLine( Console.OpenStandardError() );
             Console.WriteLine(
-@"  	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+                @"  	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
 U+250x 	─ 	━ 	│ 	┃ 	┄ 	┅ 	┆ 	┇ 	┈ 	┉ 	┊ 	┋ 	┌ 	┍ 	┎ 	┏
 U+251x 	┐ 	┑ 	┒ 	┓ 	└ 	┕ 	┖ 	┗ 	┘ 	┙ 	┚ 	┛ 	├ 	┝ 	┞ 	┟
 U+252x 	┠ 	┡ 	┢ 	┣ 	┤ 	┥ 	┦ 	┧ 	┨ 	┩ 	┪ 	┫ 	┬ 	┭ 	┮ 	┯
@@ -36,11 +51,20 @@ U+257x 	╰ 	╱ 	╲ 	╳ 	╴ 	╵ 	╶ 	╷ 	╸ 	╹ 	╺ 	╻ 	╼ 	╽ 	�
             └───────────────────┘▒
              ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 " );*/
-            Console.ReadLine();
-            //testtask t = new testtask( "Test",ConsoleColor.Yellow );
-            //t.Run();
-            //Console.WriteLine( "E" );
-            //Console.ReadLine();
+        }
+    }
+
+    class testclass<T> {
+
+        private dynamic variable;
+        public testclass(dynamic _variable) {
+            variable = _variable;
+            print();
+        }
+
+        public void print() {
+
+            Console.WriteLine( variable * variable);
         }
     }
 
