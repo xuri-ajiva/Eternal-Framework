@@ -36,18 +36,18 @@ namespace overlaytests {
         private void ILoad(object sender, EventArgs e) {
             var r = new Random();
 
-            this.BackColor = Color.DeepPink;
-            this.TransparencyKey = this.BackColor;
-            this.TopMost = true;
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.DoubleBuffered = true;
-            this.ShowInTaskbar = false;
+            BackColor = Color.DeepPink;
+            TransparencyKey = BackColor;
+            TopMost = true;
+            FormBorderStyle = FormBorderStyle.None;
+            DoubleBuffered = true;
+            ShowInTaskbar = false;
 
-            int initialStyle = GetWindowLong( this.Handle, -20 );
-            SetWindowLong( this.Handle, -20, initialStyle | 0x80000 | 0x20 );
+            var initialStyle = GetWindowLong( Handle, -20 );
+            SetWindowLong( Handle, -20, initialStyle | 0x80000 | 0x20 );
 
-            this.Location = new Point( 0, 0 );
-            this.Size = Screen.PrimaryScreen.Bounds.Size;
+            Location = new Point( 0, 0 );
+            Size = Screen.PrimaryScreen.Bounds.Size;
 
             Updater.Start();
         }
@@ -58,26 +58,23 @@ namespace overlaytests {
         public Brush brush = new SolidBrush( Color.Black );
 
         public Source() {
-            this.DoubleBuffered = true;
-            this.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Location = new System.Drawing.Point( 0, 0 );
-            this.Name = "Source";
-            this.TabIndex = 0;
-            this.Paint += new System.Windows.Forms.PaintEventHandler( this.IPaint );
-
-            //SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            //SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            //UpdateStyles();
+            DoubleBuffered = true;
+            Dock = System.Windows.Forms.DockStyle.Fill;
+            Location = new System.Drawing.Point( 0, 0 );
+            Name = "Source";
+            TabIndex = 0;
+            Paint += new System.Windows.Forms.PaintEventHandler( IPaint );
         }
+
         private void IPaint(object sender, PaintEventArgs e) {
             if (Program.draw) {
                 g = e.Graphics;
-                g.Clear( this.BackColor );
+                g.Clear( BackColor );
 
-                for (int i = 0; i < Program.rectangles.Count; i++) {
-                    Rect r = Program.rectangles[i];
+                for (var i = 0; i < Program.rectangles.Count; i++) {
+                    var r = Program.rectangles[i];
 
-                    Pen p = new Pen( r._color, r._size );
+                    var p = new Pen( r._color, r._size );
 
                     Brush b = new SolidBrush( r._color );
 
@@ -86,7 +83,8 @@ namespace overlaytests {
                     if (!r._fill)
                         g.DrawRectangle( p, r._rectangle );
                 }
-            } else
+            }
+            else
                 Program.draw = true;
         }
     }

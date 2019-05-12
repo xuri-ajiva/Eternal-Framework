@@ -243,7 +243,7 @@ namespace Eternal.Ai {
                 Console.WriteLine( $"[{i}]: {@base.ToChange[i]}." );
             }
             Console.WriteLine( "      " );
-            stats s = new stats( @base.Round, ts, @base.Variable );
+            var s = new stats( @base.Round, ts, @base.Variable );
             _stats.Add( s );
         }
 

@@ -11,7 +11,7 @@ namespace overlaytests {
         public double b;
 
         public void Square() {
-            double tmp = ( a * a ) - ( b * b );
+            var tmp = ( a * a ) - ( b * b );
 
             b = 2.0 * a * b;
             a = tmp;

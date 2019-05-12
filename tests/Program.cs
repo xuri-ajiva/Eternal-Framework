@@ -10,10 +10,19 @@ namespace tests {
     class Program {
         static void Main(string[] args) {
 
+
+            var tps = (float) 1000 / 60;
+            Console.WriteLine( tps );
+            var fps = Math.DivRem( 1000, 60, out var result );
+            Console.WriteLine( fps );
+            Console.WriteLine( result );
+            Console.WriteLine( tps - fps );
+
+            /*
             new testclass<int>( 7 );
             new testclass<double>( 8D );
             new testclass<string>( "test" );
-
+            */
 
             Console.ReadLine();
             //testtask t = new testtask( "Test",ConsoleColor.Yellow );
@@ -64,7 +73,7 @@ U+257x 	╰ 	╱ 	╲ 	╳ 	╴ 	╵ 	╶ 	╷ 	╸ 	╹ 	╺ 	╻ 	╼ 	╽ 	�
 
         public void print() {
 
-            Console.WriteLine( variable * variable);
+            Console.WriteLine( variable * variable );
         }
     }
 

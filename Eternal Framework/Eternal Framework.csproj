@@ -52,6 +52,9 @@
     <Compile Include="Ai\stats.cs" />
     <Compile Include="Drawing\ImageSearch.cs" />
     <Compile Include="EternalMain.cs" />
+    <Compile Include="Forms\GraphicsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MathE\Complex.cs" />
     <Compile Include="Net\Ftp.cs" />
     <Compile Include="privatevar\privatestaff.cs" />

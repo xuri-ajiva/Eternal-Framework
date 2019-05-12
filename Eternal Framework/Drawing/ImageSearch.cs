@@ -66,7 +66,7 @@ namespace Eternal.Drawing {
             var bitmapData = bitmap.LockBits( new Rectangle( 0, 0, bitmap.Width, bitmap.Height ), ImageLockMode.ReadOnly,
                 PixelFormat.Format32bppArgb );
 
-            for (int y = 0; y < bitmap.Height; ++y) {
+            for (var y = 0; y < bitmap.Height; ++y) {
                 result[y] = new int[bitmap.Width];
                 Marshal.Copy( bitmapData.Scan0 + y * bitmapData.Stride, result[y], 0, result[y].Length );
             }
@@ -89,7 +89,7 @@ namespace Eternal.Drawing {
         }
 
         private bool ContainSameElements(int[] first, int firstStart, int[] second, int secondStart, int length, int toleranz = 0) {
-            for (int i = 0; i < length; ++i) {
+            for (var i = 0; i < length; ++i) {
                 if (Math.Abs( first[i + firstStart] - second[i + secondStart] ) > toleranz) {
                     return false;
                 }
@@ -98,8 +98,8 @@ namespace Eternal.Drawing {
         }
 
         private bool IsNeedlePresentAtLocation(int[][] haystack, int[][] needle, Point point, int alreadyVerified, int toleranz = 0) {
-            //we already know that "alreadyVerified" lines already match, so skip them
-            for (int y = alreadyVerified; y < needle.Length; ++y) {
+            //alreadyVerified -> skip
+            for (var y = alreadyVerified; y < needle.Length; ++y) {
                 if (!ContainSameElements( haystack[y + point.Y], point.X, needle[y], 0, needle.Length, toleranz )) {
                     return false;
                 }
@@ -171,7 +171,7 @@ namespace Eternal.Drawing {
 
             Point? res = null;
 
-            Thread seatch = new Thread( () => {
+            var seatch = new Thread( () => {
                 res = _imageSearchMethode == ImageSearchMethode.Fast ? FindBitmap_Fast( _seatchInBitmap, _seatchForBitmap, _toleranz ) :
                     FindBitmap_Slow( _seatchInBitmap, _seatchForBitmap, _toleranz );
             } );

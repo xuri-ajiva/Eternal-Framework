@@ -32,8 +32,8 @@ namespace formstest {
             var rangewWhide = (double) Whide / 2;
             var rangehHeigth = (double) Heigth / 2;
 
-            for (double i = -rangewWhide; i < rangewWhide / zom; i += 1 / zom) {
-                for (double j = -rangehHeigth; j < rangehHeigth / zom; j += 1 / zom) {
+            for (var i = -rangewWhide; i < rangewWhide / zom; i += 1 / zom) {
+                for (var j = -rangehHeigth; j < rangehHeigth / zom; j += 1 / zom) {
 
 
                     if (false) {

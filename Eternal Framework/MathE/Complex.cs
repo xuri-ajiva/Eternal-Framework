@@ -11,7 +11,7 @@ namespace Eternal.MathE {
         public double imaginary;
 
         public void Square() {
-            double tmp = ( real * real ) - ( imaginary * imaginary );
+            var tmp = ( real * real ) - ( imaginary * imaginary );
 
             imaginary = 2.0 * real * imaginary;
             real = tmp;

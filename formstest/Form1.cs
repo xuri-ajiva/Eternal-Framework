@@ -27,7 +27,7 @@ namespace formstest {
 
             Genbitmap();
 
-            int fps = 0;
+            var fps = 0;
             var update = new Thread( () => {
 
                 while (true) {
@@ -54,8 +54,8 @@ namespace formstest {
         }
 
         private void Genbitmap() {
-            for (int i = 0; i < 255; i++) {
-                for (int j = 0; j < 255; j++) {
+            for (var i = 0; i < 255; i++) {
+                for (var j = 0; j < 255; j++) {
                     bm.SetPixel( i, j, calculatecolor( i, j, frame ) );
                 }
             }
@@ -65,8 +65,8 @@ namespace formstest {
             if (true) {
                 bm = new Bitmap( Width, Height );
 
-                for (int i = 0; i < 255; i++) {
-                    for (int j = 0; j < 255; j++) {
+                for (var i = 0; i < 255; i++) {
+                    for (var j = 0; j < 255; j++) {
                         bm.SetPixel( i, j, calculatecolor( i, j, frame ) );
                         //bm.SetPixel( i, j, Color.AntiqueWhite );
                     }
@@ -86,7 +86,7 @@ namespace formstest {
         }
 
         public static void wait(int milliseconds) {
-            System.Windows.Forms.Timer timer1 = new System.Windows.Forms.Timer();
+            var timer1 = new System.Windows.Forms.Timer();
             if (milliseconds == 0 || milliseconds < 0) return;
             timer1.Interval = milliseconds;
             timer1.Enabled = true;

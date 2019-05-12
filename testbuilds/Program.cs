@@ -1,6 +1,7 @@
 ﻿using Eternal.Ai;
 using Eternal.Ai.Modle;
 using Eternal.Drawing;
+using Eternal.Forms;
 using Eternal.Net;
 using Eternal.Utils;
 using Eternal.Visualisation;
@@ -10,12 +11,16 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using testbuilds.TestUtils;
 
 namespace testbuilds {
     class Program {
+
         public static void Main(string[] args) {
-            new EternalFramework.EternalMain( 1 );
+            //new EternalFramework.EternalMain( 1 );
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault( true );
             new Program();
         }
 
@@ -25,8 +30,9 @@ namespace testbuilds {
             var ai = new ChoisObjekts( "AiTest", _Ai );
             var task = new ChoisObjekts( "Testtest With Ftp", _Task );
             var taskingo = new ChoisObjekts( "TaskInfoTests", _TaskInfo );
+            var gravigsform = new ChoisObjekts( "GraficsForm tests", _GraphicsForm );
 
-            Utils.SetupChoise( new[] { ftp, task, taskingo, ai, ims } );
+            Utils.SetupChoise( new[] { ftp, task, taskingo, ai, ims, gravigsform } );
             Console.WriteLine( "\n" );
             Console.WriteLine( "Press any Key to Exit!" );
             Console.ReadKey();
@@ -160,7 +166,7 @@ namespace testbuilds {
                     cash += array[4];
                 }*/
 
-                for (int j = 0; j < array.Length; j++) {
+                for (var j = 0; j < array.Length; j++) {
                     array[j] = R( array[j] );
                 }
 
@@ -175,7 +181,7 @@ namespace testbuilds {
         }
 
         private double R(double d) {
-            decimal m = (decimal) d; return (double) ( Math.Truncate( m * 1000m ) / 1000m );
+            var m = (decimal) d; return (double) ( Math.Truncate( m * 1000m ) / 1000m );
         }
 
         private void _Ai() {
@@ -190,7 +196,7 @@ namespace testbuilds {
             Console.Write( "Bitte Thaget(int) angeben:" );
             double.TryParse( Console.ReadLine(), out var thaget );
 
-            int tolleranz = (int) ( thaget / 5D );
+            var tolleranz = (int) ( thaget / 5D );
 
             Console.WindowWidth = 153;
 
@@ -318,5 +324,24 @@ namespace testbuilds {
         }
         #endregion
 
+        #region GraphicsForm
+
+        private static void _GraphicsForm() {
+            var graphicsForm = new GraphicsForm( 20, DrawAction, GraphicsForm.WindowType.Form );
+            Application.Run( graphicsForm );
+        }
+
+        private static void DrawAction(Graphics g, int frame) {
+            const int max = 100;
+            const int scale = 8;
+            var k = frame % max;
+            for (var i = 0; i < max; i++) {
+                for (var j = 0; j < max; j++) {
+                    g.FillRectangle( new SolidBrush( Color.FromArgb( 255, i, j, k ) ), new Rectangle( i * scale, j * scale, scale, scale ) );
+                }
+            }
+        }
+
+        #endregion
     }
 }
