@@ -278,7 +278,7 @@ namespace Eternal.Ai {
 namespace Eternal.Ai.Modle {
 
     public class ModuleBase : EternalFramework.EternalMain {
-        private bool Init;
+        private bool _init;
 
         private dynamic _variable;
         private readonly dynamic _thaget;
@@ -296,7 +296,7 @@ namespace Eternal.Ai.Modle {
         private dynamic _nextTry;
 
         public ModuleBase(dynamic variable, dynamic thaget, dynamic minOfset, dynamic maxOfset, dynamic[] Tochange, Action<ModuleBase, bool> action, int tolleranz) : base() {
-            Init = true;
+            _init = true;
             _variable = variable;
             _thaget = thaget;
             _minOfset = minOfset;

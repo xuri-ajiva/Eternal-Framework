@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Eternal.Forms {
     partial class GraphicsForm {
-        private System.ComponentModel.IContainer components;
+        private IContainer components;
 
         protected override void Dispose(bool disposing) {
             // ReSharper disable once UseNullPropagation
@@ -18,7 +18,8 @@ namespace Eternal.Forms {
         }
 
         private void InitializeComponent() {
-            components = new System.ComponentModel.Container();
+            components = new Container();
+            // ReSharper disable once RedundantNameQualifier
             _updater = new System.Windows.Forms.Timer( components );
             SuspendLayout();
             // 
@@ -66,7 +67,7 @@ namespace Eternal.Forms {
 
         [StructLayout( LayoutKind.Sequential )]
         // ReSharper disable once InconsistentNaming
-        private struct RECT {
+        public struct RECT {
             public readonly int Left;
             public readonly int Top;
             public readonly int Right;
@@ -80,6 +81,7 @@ namespace Eternal.Forms {
 
         private RECT _rect;
         private Rectangle _rectangle;
+        private IntPtr _hWnd = IntPtr.Zero;
 
         private readonly DrawSource _drawSource;
 
@@ -87,6 +89,7 @@ namespace Eternal.Forms {
         private void FpsUpdater() {
             while (true) {
                 Thread.Sleep( 1000 );
+                if (_type == WindowType.OverlaySingleWindow) return;
                 try {
 
                     MethodInvoker del = delegate { Text = $"FPS:{_fps}"; };
@@ -138,18 +141,7 @@ namespace Eternal.Forms {
             }
 
             if (_type == WindowType.OverlaySingleWindow && _windowToOverlay != "") {
-                var hWnd2 = FindWindow( null, _windowToOverlay );
-                GetWindowRect( hWnd2, out _rect );
-
-
-                _rectangle.X = _rect.Left;
-                _rectangle.Y = _rect.Top;
-                _rectangle.Width = _rect.Right - _rect.Left + 1;
-                _rectangle.Height = _rect.Bottom - _rect.Top + 1;
-
-                Size = new Size( _rectangle.Width, _rectangle.Height );
-                Top = _rect.Top;
-                Left = _rect.Left;
+                set_hWnd();
             }
 
             _updater.Start();
@@ -165,9 +157,71 @@ namespace Eternal.Forms {
             _rest -= bonus;
             _updater.Interval = _tpfInt + bonus;
 
+            if (_type == WindowType.OverlaySingleWindow)
+                Overlay();
+
             _fps++;
             _drawSource.Refresh();
         }
+
+        private bool set_hWnd() {
+            if (_windowToOverlay == "") return false;
+            try {
+                _hWnd = FindWindow( null, _windowToOverlay );
+                if (_hWnd != IntPtr.Zero) return true;
+
+                Console.WriteLine( "Window Not Found!" );
+                Application.Exit();
+            }
+            catch {
+                //  
+            }
+            return false;
+        }
+
+        private void Overlay() {
+
+            if (_hWnd == IntPtr.Zero) if (!set_hWnd()) return;
+
+            GetWindowRect( _hWnd, out _rect );
+            _rectangle.X = _rect.Left;
+            _rectangle.Y = _rect.Top;
+            _rectangle.Width = _rect.Right - _rect.Left + 1;
+            _rectangle.Height = _rect.Bottom - _rect.Top + 1;
+
+            Size = new Size( _rectangle.Width, _rectangle.Height );
+            Top = _rect.Top;
+            Left = _rect.Left;
+        }
+
+        #region public
+
+        public DrawSource DrawSource => _drawSource;
+
+        public int Fps => _fps;
+
+        public IntPtr HWnd => _hWnd;
+
+        public RECT Rect => _rect;
+
+        public Rectangle Rectangle => _rectangle;
+
+        public float Rest => _rest;
+
+        public int TpfInt => _tpfInt;
+
+        public float TpFoset => _tpFoset;
+
+        public WindowType Type => _type;
+
+        // ReSharper disable once RedundantNameQualifier
+        public System.Windows.Forms.Timer Updater => _updater;
+
+        public string WindowToOverlay => _windowToOverlay;
+
+        public IContainer Components => components;
+
+        #endregion
     }
 
     public sealed class DrawSource : Panel {

@@ -16,15 +16,22 @@ using testbuilds.TestUtils;
 
 namespace testbuilds {
     class Program {
-
         public static void Main(string[] args) {
             //new EternalFramework.EternalMain( 1 );
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault( true );
+
+            Console.CancelKeyPress += Cancle;
+
             new Program();
         }
 
+        private static void Cancle(object sender, ConsoleCancelEventArgs e) {
+            e.Cancel = true;
+        }
+
         private Program() {
+            var exit = new ChoisObjekts( "Exit(0)", _Exit );
             var ftp = new ChoisObjekts( "FtpTest", _Ftp );
             var ims = new ChoisObjekts( "ImageScanTest", _ImageScan );
             var ai = new ChoisObjekts( "AiTest", _Ai );
@@ -32,12 +39,21 @@ namespace testbuilds {
             var taskingo = new ChoisObjekts( "TaskInfoTests", _TaskInfo );
             var gravigsform = new ChoisObjekts( "GraficsForm tests", _GraphicsForm );
 
-            Utils.SetupChoise( new[] { ftp, task, taskingo, ai, ims, gravigsform } );
-            Console.WriteLine( "\n" );
-            Console.WriteLine( "Press any Key to Exit!" );
-            Console.ReadKey();
-            Console.Clear();
-            Thread.Sleep( 500 );
+            while (true) {
+
+                Utils.SetupChoise( new[] { exit, ftp, task, taskingo, ai, ims, gravigsform } );
+                Console.WriteLine( "\n" );
+                Thread.Sleep( 1000 );
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        private void _Exit() {
+            Console.WriteLine( "\nPress Any Key To Exit..." );
+            var p = ParentProcessUtilities.GetParentProcess();
+            if (p.ProcessName.ToLower() != "cmd")
+                Console.ReadKey();
             Environment.Exit( 0 );
         }
 
@@ -84,10 +100,11 @@ namespace testbuilds {
             const string filename = "Roaming.rar";
             _state = TaskInfo.State.running;
             var passwd = Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) );
+            Thread up = new Thread( () => { } );
             try {
                 _ftp = new FtpClinet( "ftp://127.0.0.1/" + filename, "test", passwd, filename, (int) Math.Pow( 2, 26 ) );
                 Console.Write( "\n  " );
-                var up = new Thread( () => {
+                up = new Thread( () => {
                     while (true)
                         if (_ti != null) {
                             _ti._State = _state;
@@ -114,6 +131,7 @@ namespace testbuilds {
             catch (Exception) {
                 _state = TaskInfo.State.fail;
             }
+            up.Abort();
         }
         #endregion
 
@@ -327,7 +345,29 @@ namespace testbuilds {
         #region GraphicsForm
 
         private static void _GraphicsForm() {
-            var graphicsForm = new GraphicsForm( 20, DrawAction, GraphicsForm.WindowType.Form );
+
+            Console.WriteLine( "Bitte wählen:\n[0]" + GraphicsForm.WindowType.Form + "\n[1]" + GraphicsForm.WindowType.Fullscreen + "\n[2]" + GraphicsForm.WindowType.OverlaySingleWindow );
+            var chois = -1;
+            while (!int.TryParse( Console.ReadLine(), out chois ) && chois <= 3 && chois >= 0) {
+
+            }
+
+            var name = "";
+            var type = GraphicsForm.WindowType.Form;
+            switch (chois) {
+                case 0:
+                    type = GraphicsForm.WindowType.Form;
+                    break;
+                case 1:
+                    type = GraphicsForm.WindowType.Fullscreen;
+                    break;
+                case 2:
+                    type = GraphicsForm.WindowType.OverlaySingleWindow;
+                    Console.Write( "Bitte Fensternahme angeben:" );
+                    name = Console.ReadLine();
+                    break;
+            }
+            var graphicsForm = new GraphicsForm( 20, DrawAction, type, name );
             Application.Run( graphicsForm );
         }
 
