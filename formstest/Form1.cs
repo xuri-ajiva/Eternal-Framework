@@ -1,6 +1,4 @@
-﻿using overlaytests;
-using System;
-using System.Diagnostics.Eventing.Reader;
+﻿using System;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
@@ -15,7 +13,6 @@ namespace formstest {
 
         private Bitmap bm = new Bitmap( 255, 255 );
         private const float MaxFps = 120f;
-
 
         private void Form1_Load(object sender, EventArgs e) {
 
@@ -37,7 +34,7 @@ namespace formstest {
                     pictureBox1.Image = Program.Calculate_Mandelbrot( pictureBox1.Width, pictureBox1.Height );
 
                     //pictureBox1.Image = OnUpdate( frame, 255, 255 );
-                    Thread.Sleep( (int) ((float) 1000 /  MaxFps ) );
+                    Thread.Sleep( (int) ( 1000 / MaxFps ) );
                 }
             } );
             update.Start();

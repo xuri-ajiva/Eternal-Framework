@@ -28,6 +28,7 @@ namespace testbuilds {
 
         private static void Cancle(object sender, ConsoleCancelEventArgs e) {
             e.Cancel = true;
+            Console.Clear();
         }
 
         private Program() {

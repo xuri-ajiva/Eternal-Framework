@@ -15,7 +15,7 @@ namespace formstest {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault( false );
-            Application.Run( new test() );
+            Application.Run( new Form2() );
         }
         public static Bitmap Calculate_Mandelbrot(int Whide, int Heigth) {
             var bmap = new Bitmap( Whide, Heigth );
