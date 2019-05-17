@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace formstest {
@@ -18,9 +11,29 @@ namespace formstest {
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            progbar1.Vaule = int.Parse(textBox1.Text);
+        private void button1_Click(object sender, EventArgs e) {
+            progbar1.Vaule = int.Parse( textBox1.Text );
+            progbar1.Style = ProgressBarStyle.Marquee;
+        }
+
+        private void button2_Click(object sender, EventArgs e) {
+            
+        }
+
+        private void toolStripContainer1_ContentPanel_Load(object sender, EventArgs e) {
+
+        }
+
+        private void toolStripContainer1_LeftToolStripPanel_Click(object sender, EventArgs e) {
+
+        }
+
+        private void toolStripContainer1_TopToolStripPanel_Click(object sender, EventArgs e) {
+
+        }
+
+        private void toolStripContainer1_RightToolStripPanel_Click(object sender, EventArgs e) {
+
         }
     }
 }

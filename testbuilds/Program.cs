@@ -17,7 +17,7 @@ using testbuilds.TestUtils;
 namespace testbuilds {
     class Program {
         public static void Main(string[] args) {
-            //new EternalFramework.EternalMain( 1 );
+            new EternalFramework.EternalMain( 1 );
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault( true );
 
@@ -348,6 +348,7 @@ namespace testbuilds {
         private static void _GraphicsForm() {
 
             Console.WriteLine( "Bitte wählen:\n[0]" + GraphicsForm.WindowType.Form + "\n[1]" + GraphicsForm.WindowType.Fullscreen + "\n[2]" + GraphicsForm.WindowType.OverlaySingleWindow );
+            // ReSharper disable once RedundantAssignment
             var chois = -1;
             while (!int.TryParse( Console.ReadLine(), out chois ) && chois <= 3 && chois >= 0) {
 

@@ -1,16 +1,22 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace tests {
     class Program {
+        private static int _a = 1;
+
+        public static int a => _a++;
+
         static void Main(string[] args) {
 
 
+            if (a == 1 && a == 2 && a == 3)
+                Console.WriteLine( true );
+
+
+
+            /*
             var tps = (float) 1000 / 60;
             Console.WriteLine( tps );
             var fps = Math.DivRem( 1000, 60, out var result );
@@ -64,8 +70,8 @@ U+257x 	╰ 	╱ 	╲ 	╳ 	╴ 	╵ 	╶ 	╷ 	╸ 	╹ 	╺ 	╻ 	╼ 	╽ 	�
     }
 
     class testclass<T> {
+        private readonly dynamic variable;
 
-        private dynamic variable;
         public testclass(dynamic _variable) {
             variable = _variable;
             print();
