@@ -3,28 +3,41 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 
 
 
 /*
-    Name : begin : ende : 
+    Name : begin : StrEnd : 
 
     */
 namespace container {
     public class Program {
-        public static string filename = "archife.pac";
-        public static string[] files = new string[99];
-        private static List<string> fs;// = new List<string>(files);
+        public static string CreateMd5(string input) {
+            using (var md5 = MD5.Create()) {
+                var bytes = Encoding.Unicode.GetBytes( input );
+                var hash = md5.ComputeHash( bytes );
+                var stringBuilder = new StringBuilder();
+                for (var index = 0; index < 5; ++index)
+                    stringBuilder.Append( hash[index].ToString( "x2" ) );
+                return stringBuilder.ToString();
+            }
+        }
+
+
+        public static string Filename = "+.pac";
+        public static string[] Files = new string[99];
+        private static List<string> _fs;// = new List<string>(files);
 
         public static int IntLength => int.MaxValue.ToString().Length;
 
         public Program(string[] args) {
 
             if (args.Length >= 3) {
-                filename = args[1];
-                fs = new List<string>( args );
-                fs.RemoveRange( 0, 2 );
+                Filename = args[1];
+                _fs = new List<string>( args );
+                _fs.RemoveRange( 0, 2 );
                 switch (args[0]) {
                     case "p":
                         Pack();
@@ -39,7 +52,7 @@ namespace container {
             }
 
             if (args.Length == 2) {
-                filename = args[1];
+                Filename = args[1];
                 if (args[0].ToLower() == "u")
                     Unpack();
                 else
@@ -64,13 +77,13 @@ namespace container {
                 switch (args[0]) {
                     case "p":
                         Console.Write( "Bitte AusgabeDatei angeben:" );
-                        filename = Console.ReadLine();
-                        fs = new List<string>( args );
-                        fs.RemoveAt( 0 );
+                        Filename = Console.ReadLine();
+                        _fs = new List<string>( args );
+                        _fs.RemoveAt( 0 );
                         Pack();
                         break;
                     case "u":
-                        filename = args[1];
+                        Filename = args[1];
                         Unpack();
                         break;
                     default:
@@ -99,12 +112,12 @@ namespace container {
         private void Pack() {
 
             Console.WriteLine( "Creating Header..." );
-            var headList = new string[fs.Count];
+            var headList = new string[_fs.Count];
 
-            for (var i = 0; i < fs.Count; i++) {
-                var s = fs[i];
+            for (var i = 0; i < _fs.Count; i++) {
+                var s = _fs[i];
                 Console.WriteLine( "Processing Header for file:" + s );
-                FileInfo f = new FileInfo( s );
+                var f = new FileInfo( s );
                 headList[i] = ( MakeList( new[] { f.Name, f.Length.ToString() } ) );
             }
 
@@ -114,14 +127,12 @@ namespace container {
 
             //contend
             var contend = new List<byte>();
-            foreach (var s in fs) {
+            foreach (var s in _fs) {
 
                 Console.WriteLine( "Processing contend of file:" + s );
 
                 var tmp = File.ReadAllBytes( s );
-                foreach (var i in tmp) {
-                    contend.Add( i );
-                }
+                contend.AddRange( tmp );
             }
             var final = new byte[contend.Count + head.Length];
 
@@ -138,25 +149,25 @@ namespace container {
 
             //Console.WriteLine( Encoding.UTF8.GetString( final ) );
             Console.WriteLine( "Writing all to file" );
-            File.WriteAllBytes( filename, final );
+            File.WriteAllBytes( Filename, final );
 
             Console.WriteLine( "Cleaning..." );
+            // ReSharper disable RedundantAssignment
             final = new byte[1];
             contend = new List<byte>();
             head = new byte[1];
             header = "";
+            // ReSharper restore RedundantAssignment
         }
         private void Unpack() {
-            var contend = new List<byte>( File.ReadAllBytes( filename ) );
+            var contend = new List<byte>( File.ReadAllBytes( Filename ) );
 
             Console.WriteLine( "reading header..." );
 
             var hlength = GetNextInt( Encoding.UTF8.GetString( contend.GetRange( 0, 30 ).ToArray() ) );
 
             var ascy = Encoding.UTF8.GetString( contend.GetRange( hlength.ToString().Length, hlength ).ToArray() );
-            var Elements = UnMakeList( ascy, out var leng, false );
-
-            ascy = "";
+            var elements = UnMakeList( ascy, out _, false );
 
             hlength += hlength.ToString().Length;
 
@@ -166,25 +177,27 @@ namespace container {
             // File.WriteAllBytes( "tmp", contend.ToArray() );
 
             var cn = 0;
-            for (int i = 0; i < Elements.Length; i++) {
-                var e = Elements[i];
+            for (var i = 0; i < elements.Length; i++) {
+                var e = elements[i];
 
-                var ElementTemp = UnMakeList( e, out _, false );
-                Console.WriteLine( $"Extracting File: {ElementTemp[0]}, Length: {ElementTemp[1]}" );
-                var itemlemgth = int.Parse( ElementTemp[1] );
+                var elementTemp = UnMakeList( e, out _, false );
+                Console.WriteLine( $"Extracting File: {elementTemp[0]}, Length: {elementTemp[1]}" );
+                var itemlemgth = int.Parse( elementTemp[1] );
 
-                File.WriteAllBytes( ElementTemp[0], contend.GetRange( cn, itemlemgth ).ToArray() );
+                File.WriteAllBytes( elementTemp[0], contend.GetRange( cn, itemlemgth ).ToArray() );
                 cn += itemlemgth;
             }
 
             Console.WriteLine( "Cleaning..." );
+            // ReSharper disable RedundantAssignment
             contend = new List<byte>();
             ascy = "";
+            // ReSharper restore RedundantAssignment
         }
 
-        public string ReverseSize(string daten) {
+        public string ReverseSize(string dtn) {
             var result = "";
-            var length = (short) daten.Length;
+            var length = (short) dtn.Length;
 
             for (var i = length.ToString().Length; i < IntLength; i++) {
                 result += "0";
@@ -192,10 +205,11 @@ namespace container {
 
             result += length.ToString();
 
-            result += daten;
+            result += dtn;
             return result;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public string MakeVailed(string size) {
             var result = "";
 
@@ -207,42 +221,42 @@ namespace container {
             return result;
         }
 
-        public static string MakeList(string[] daten) {
-            string returns = "";
+        public static string MakeList(string[] dtn) {
+            var returns = "";
 
-            foreach (var s in daten) {
+            foreach (var s in dtn) {
                 returns += s.Replace( "\\", "\\%" ).Replace( "\n", "\\/" ) + "\\=";
             }
 
             returns += "\\?";
-            return "\\&" + daten.Length + "\\$" + returns + "\n";
+            return "\\&" + dtn.Length + "\\$" + returns + "\n";
         }
-        public static string[] UnMakeList(string daten, out int length, bool WriteOutput = true) {
-            int counts = 0;
-            var wo = WriteOutput;
-            int c = 0;
+        public static string[] UnMakeList(string dtn, out int length, bool writeOutput = true) {
+            var counts = 0;
+            var wo = writeOutput;
+            var c = 0;
 
             try {
 
-                if (daten.Substring( c, 2 ) == "\\&")
+                if (dtn.Substring( c, 2 ) == "\\&")
                     counts++;
                 else throw new Exception( "No valet String" );
 
                 c += 2;
 
-                List<string> returns = new List<string>();
+                var returns = new List<string>();
 
-                var anzahl = GetNextInt( daten.Substring( c, int.MaxValue.ToString().Length ) );
+                var anzahl = GetNextInt( dtn.Substring( c, int.MaxValue.ToString().Length ) );
                 c += anzahl.ToString().Length;
 
-                if (daten.Substring( c, 2 ) == "\\$")
+                if (dtn.Substring( c, 2 ) == "\\$")
                     counts++;
                 else throw new Exception( "Error:!!!" );
 
                 c += 2;
 
                 for (var i = 0; i < anzahl; i++) {
-                    var element = getElementNext( daten.Substring( c ), "\\=" );
+                    var element = GetElementNext( dtn.Substring( c ), "\\=" );
 
                     if (wo)
                         Console.WriteLine( element );
@@ -250,18 +264,18 @@ namespace container {
                     returns.Add( element );
                     c += ( element.Length );
 
-                    if (daten.Substring( c, 2 ) == "\\=")
+                    if (dtn.Substring( c, 2 ) == "\\=")
                         counts++;
                     else throw new Exception( "Error:!!!" );
                     c += ( 2 );
                 }
 
-                if (daten.Substring( c, 2 ) == "\\?")
+                if (dtn.Substring( c, 2 ) == "\\?")
                     counts++;
                 else throw new Exception( "Error:!!!" );
                 c += 2;
 
-                if (daten.Substring( c, 1 ) == "\n")
+                if (dtn.Substring( c, 1 ) == "\n")
                     counts++;
                 else throw new Exception( "Error:!!!" );
                 c += 1;
@@ -270,11 +284,11 @@ namespace container {
                 if (wo)
                     Console.WriteLine( $"Finished:[{counts}/{mx}] " + ( ( counts == mx ) ? "Perfect!" : ( counts == mx - 1 ) ? "Good" : "We Do not get all =[" ) );
 
-                //if (daten.Substring( Il + 2 + length, 2 ) == "\n")
+                //if (dtn.Substring( Il + 2 + length, 2 ) == "\n")
                 //    Console.WriteLine( "vailet" );
 
                 var ret = new string[returns.Count];
-                for (int i = 0; i < ret.Length; i++) {
+                for (var i = 0; i < ret.Length; i++) {
                     ret[i] = returns[i].Replace( "\\%", "\\" ).Replace( "\\/", "\n" );
                 }
 
@@ -289,19 +303,19 @@ namespace container {
             }
         }
 
-        private static string getElementNext(string daten, string ende) {
-            int length = -99;
-            for (int i = 0; i < daten.Length; i++) {
-                if (daten.Substring( i, 2 ) == ende) {
+        private static string GetElementNext(string dtn, string strEnd) {
+            var length = -99;
+            for (var i = 0; i < dtn.Length; i++) {
+                if (dtn.Substring( i, 2 ) == strEnd) {
                     length = i; break;
                 }
             }
 
-            return daten.Substring( 0, length );
+            return dtn.Substring( 0, length );
         }
 
         private static int GetNextInt(string v) {
-            var returns = -9999;
+            int returns;
             var i = 1;
             for (; i < v.Length; i++)
                 if (!int.TryParse( v.Substring( 0, i ), out returns )) break;
@@ -310,8 +324,6 @@ namespace container {
         }
 
         static int Main(string[] args) {
-
-
             //#if DEBUG
             //            Console.WriteLine( "Debug version!" );
             //#if pack
@@ -322,11 +334,13 @@ namespace container {
             //            //#warning Using Debug
             //#endif
 
-            var program = new Program( args );
+            var _ = new Program( args );
 
             return 0;
         }
-        static void test() {
+
+        // ReSharper disable once UnusedMember.Local
+        private static void Test() {
             var x = MakeList( new[] { "TestData1", "data2", "3§", "4" } );
             x += "sdhahjkhdkahsdkhadsk";
             Console.WriteLine( x );
