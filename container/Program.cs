@@ -1,12 +1,16 @@
 ﻿//#define pack
 
-using Eternal.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 
+
+
+/*
+    Name : begin : ende : 
+
+    */
 namespace container {
     public class Program {
         public static string filename = "archife.pac";
@@ -17,63 +21,108 @@ namespace container {
 
         public Program(string[] args) {
 
-            var choise = "";
-
-            if (args.Length > 0)
-                choise = args[0];
-
-            ask:
-            {
-                if (choise == "") {
-                    Console.WriteLine( "p/u" );
-                    choise = Console.ReadLine().ToLower();
+            if (args.Length >= 3) {
+                filename = args[1];
+                fs = new List<string>( args );
+                fs.RemoveRange( 0, 2 );
+                switch (args[0]) {
+                    case "p":
+                        Pack();
+                        break;
+                    case "u":
+                        Unpack();
+                        break;
+                    default:
+                        PrintSyntax();
+                        break;
                 }
-
-                if (choise == "p") {
-                    Console.WriteLine( "Packing..." );
-                    fs = new List<string>( args );
-                    if (fs.Count > 0) {
-                        fs.RemoveAt( 0 );
-                        pack();
-                    } else Console.WriteLine( "Bitte Dateien zum verpacken angeben!" );
-                } else if (choise == "u") {
-                    if (args.Length == 2)
-                        filename = args[1];
-                    else Console.WriteLine( "Bitte archief angeben!" );
-                    Console.WriteLine( "UnPacking..." );
-                    Unpack();
-                } else
-                    goto ask;
-
-                for (var i = 5; i > 0; i--) {
-                    Console.SetCursorPosition( 0, Console.CursorTop );
-                    Console.Write( "Programm exit in " + i.ToString() );
-                    Thread.Sleep( 500 );
-                }
-                //Console.ReadKey();
             }
+
+            if (args.Length == 2) {
+                filename = args[1];
+                if (args[0].ToLower() == "u")
+                    Unpack();
+                else
+                    PrintSyntax();
+
+            }
+
+            if (args.Length == 0) {
+                PrintSyntax();
+            }
+
+            if (args.Length == 1) {
+                if (args[0].ToLower() == ( "help" )) {
+                    PrintSyntax();
+                    Console.ReadKey();
+                }
+                Console.Write( "Packen Oder Entpacken? [p/u]:" );
+                args = new[] { Console.ReadKey().KeyChar.ToString(), args[0] };
+                Console.WriteLine();
+            }
+            if (args.Length >= 2) {
+                switch (args[0]) {
+                    case "p":
+                        Console.Write( "Bitte AusgabeDatei angeben:" );
+                        filename = Console.ReadLine();
+                        fs = new List<string>( args );
+                        fs.RemoveAt( 0 );
+                        Pack();
+                        break;
+                    case "u":
+                        filename = args[1];
+                        Unpack();
+                        break;
+                    default:
+                        PrintSyntax();
+                        break;
+                }
+            }
+
+            Console.WriteLine( "\nFinished!" );
+            Console.ReadKey();
+
         }
 
-        private void pack() {
-            var contend = new List<byte>();
+        private void PrintSyntax() {
+            Console.WriteLine( "\nArgument:   u        - Unpack" +
+                               "\n            p        - Pack" +
+                               "\n            file     - file to Pack" +
+                               "\n            archive  - file to UnPack" +
+                               "\n            Help     - This" +
+                               "\n" +
+                               "\nUsage:      File" +
+                               "\n            [p/u] archive file(0) file(1) file(n)" +
+                               "\n            u archive" );
+        }
+
+        private void Pack() {
 
             Console.WriteLine( "Creating Header..." );
+            var headList = new string[fs.Count];
 
-            var header = "";
+            for (var i = 0; i < fs.Count; i++) {
+                var s = fs[i];
+                Console.WriteLine( "Processing Header for file:" + s );
+                FileInfo f = new FileInfo( s );
+                headList[i] = ( MakeList( new[] { f.Name, f.Length.ToString() } ) );
+            }
+
+            var header = MakeList( headList );
+            var head = Encoding.UTF8.GetBytes( header.Length + header );
+            Console.WriteLine();
+
+            //contend
+            var contend = new List<byte>();
             foreach (var s in fs) {
 
-                Console.WriteLine( "Processing file:" + s );
+                Console.WriteLine( "Processing contend of file:" + s );
 
                 var tmp = File.ReadAllBytes( s );
                 foreach (var i in tmp) {
                     contend.Add( i );
                 }
-
-                var info = MakeVailed( tmp.Length.ToString() ) + Path.GetFileName( s );
-                header += StringSizer.Size( info );
             }
-            var head = Encoding.UTF8.GetBytes( StringSizer.Fullsize( StringSizer.Size( header ).Replace( "\n", "" ), IntLength ) );
-
             var final = new byte[contend.Count + head.Length];
 
             Console.WriteLine( "Creating binery..." );
@@ -102,33 +151,32 @@ namespace container {
 
             Console.WriteLine( "reading header..." );
 
-            var hlength = int.Parse( Encoding.UTF8.GetString( contend.GetRange( 0, 20 ).ToArray() ).Substring( 0, IntLength ) );
+            var hlength = GetNextInt( Encoding.UTF8.GetString( contend.GetRange( 0, 30 ).ToArray() ) );
 
-            var ascy = Encoding.UTF8.GetString( contend.GetRange( IntLength, hlength ).ToArray() );
-            int len;
-            var head = StringSizer.UnSize( ascy, out len );
+            var ascy = Encoding.UTF8.GetString( contend.GetRange( hlength.ToString().Length, hlength ).ToArray() );
+            var Elements = UnMakeList( ascy, out var leng, false );
 
             ascy = "";
-            var fullheadlength = ( len + 2 + head.Length.ToString().Length + 2 ) + IntLength;
+
+            hlength += hlength.ToString().Length;
 
             Console.WriteLine( "Isolating contend..." );
 
-            contend = contend.GetRange( fullheadlength, contend.Count - fullheadlength );
+            contend = contend.GetRange( hlength, contend.Count - hlength );
+            // File.WriteAllBytes( "tmp", contend.ToArray() );
 
+            var cn = 0;
+            for (int i = 0; i < Elements.Length; i++) {
+                var e = Elements[i];
 
-            var infos = head.Split( '\n' );
+                var ElementTemp = UnMakeList( e, out _, false );
+                Console.WriteLine( $"Extracting File: {ElementTemp[0]}, Length: {ElementTemp[1]}" );
+                var itemlemgth = int.Parse( ElementTemp[1] );
 
-            var c = 1;
-            for (var i = 0; i < infos.Length - 1; i++) {
-                var p = StringSizer.UnSize( infos[i], out var length );
-                var filename = p.Substring( IntLength );
-                var filesize = int.Parse( p.Substring( 0, IntLength ) );
-
-                Console.WriteLine( "Processing file:" + filename );
-
-                File.WriteAllBytes( filename, contend.GetRange( c, filesize ).ToArray() );
-                c += filesize;
+                File.WriteAllBytes( ElementTemp[0], contend.GetRange( cn, itemlemgth ).ToArray() );
+                cn += itemlemgth;
             }
+
             Console.WriteLine( "Cleaning..." );
             contend = new List<byte>();
             ascy = "";
@@ -159,20 +207,141 @@ namespace container {
             return result;
         }
 
+        public static string MakeList(string[] daten) {
+            string returns = "";
+
+            foreach (var s in daten) {
+                returns += s.Replace( "\\", "\\%" ).Replace( "\n", "\\/" ) + "\\=";
+            }
+
+            returns += "\\?";
+            return "\\&" + daten.Length + "\\$" + returns + "\n";
+        }
+        public static string[] UnMakeList(string daten, out int length, bool WriteOutput = true) {
+            int counts = 0;
+            var wo = WriteOutput;
+            int c = 0;
+
+            try {
+
+                if (daten.Substring( c, 2 ) == "\\&")
+                    counts++;
+                else throw new Exception( "No valet String" );
+
+                c += 2;
+
+                List<string> returns = new List<string>();
+
+                var anzahl = GetNextInt( daten.Substring( c, int.MaxValue.ToString().Length ) );
+                c += anzahl.ToString().Length;
+
+                if (daten.Substring( c, 2 ) == "\\$")
+                    counts++;
+                else throw new Exception( "Error:!!!" );
+
+                c += 2;
+
+                for (var i = 0; i < anzahl; i++) {
+                    var element = getElementNext( daten.Substring( c ), "\\=" );
+
+                    if (wo)
+                        Console.WriteLine( element );
+
+                    returns.Add( element );
+                    c += ( element.Length );
+
+                    if (daten.Substring( c, 2 ) == "\\=")
+                        counts++;
+                    else throw new Exception( "Error:!!!" );
+                    c += ( 2 );
+                }
+
+                if (daten.Substring( c, 2 ) == "\\?")
+                    counts++;
+                else throw new Exception( "Error:!!!" );
+                c += 2;
+
+                if (daten.Substring( c, 1 ) == "\n")
+                    counts++;
+                else throw new Exception( "Error:!!!" );
+                c += 1;
+
+                var mx = anzahl + 4;
+                if (wo)
+                    Console.WriteLine( $"Finished:[{counts}/{mx}] " + ( ( counts == mx ) ? "Perfect!" : ( counts == mx - 1 ) ? "Good" : "We Do not get all =[" ) );
+
+                //if (daten.Substring( Il + 2 + length, 2 ) == "\n")
+                //    Console.WriteLine( "vailet" );
+
+                var ret = new string[returns.Count];
+                for (int i = 0; i < ret.Length; i++) {
+                    ret[i] = returns[i].Replace( "\\%", "\\" ).Replace( "\\/", "\n" );
+                }
+
+                length = c;
+                return ret;
+            }
+            catch (Exception e) {
+                if (wo)
+                    Console.WriteLine( $"Error @[{counts}]: {e.Message}!" );
+                length = c;
+                return new string[] { };
+            }
+        }
+
+        private static string getElementNext(string daten, string ende) {
+            int length = -99;
+            for (int i = 0; i < daten.Length; i++) {
+                if (daten.Substring( i, 2 ) == ende) {
+                    length = i; break;
+                }
+            }
+
+            return daten.Substring( 0, length );
+        }
+
+        private static int GetNextInt(string v) {
+            var returns = -9999;
+            var i = 1;
+            for (; i < v.Length; i++)
+                if (!int.TryParse( v.Substring( 0, i ), out returns )) break;
+            int.TryParse( v.Substring( 0, i - 1 ), out returns );
+            return returns;
+        }
+
         static int Main(string[] args) {
-#if DEBUG
-            Console.WriteLine( "Debug version!" );
-#if pack
-            args = new string[] { "p", @"C:\Users\Private\source\repos\Global\Global.sln", @"C:\Users\Private\source\repos\Global\hallo welt.txt", @"C:\Users\Private\Desktop\Roaming - Kopie.rar" };
-#else
-            args = new string[] { "u", filename };
-#endif
-            //#warning Using Debug
-#endif
+
+
+            //#if DEBUG
+            //            Console.WriteLine( "Debug version!" );
+            //#if pack
+            //            args = new string[] { "p", @"D:\Sortiert\Cracked Games\Risk.of.Rain.2.v04.04.2019.rar", @"C:\Users\Xuri\Source\repos//\Eternal Framework\_Old.zip" };
+            //#else
+            //            args = new string[] { "u", filename };
+            //#endif
+            //            //#warning Using Debug
+            //#endif
 
             var program = new Program( args );
 
             return 0;
+        }
+        static void test() {
+            var x = MakeList( new[] { "TestData1", "data2", "3§", "4" } );
+            x += "sdhahjkhdkahsdkhadsk";
+            Console.WriteLine( x );
+            var m = UnMakeList( x, out var l, false );
+            Console.WriteLine( l );
+            foreach (var s in m) {
+                Console.WriteLine( s );
+            }
+
+            Console.WriteLine( x.Substring( 0, l ) + "" );
+            Console.WriteLine( x );
+
+            Console.Read();
+            Environment.Exit( 0 );
+
         }
     }
 }

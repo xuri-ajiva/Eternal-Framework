@@ -102,7 +102,7 @@ namespace Eternal.Forms {
             }
         }
 
-        public GraphicsForm(int maxFps, Action<Graphics, int> drawAction, WindowType type, string windowToOverlay = "", bool fpscounter = true) {
+        public GraphicsForm(int maxFps, WindowType type, string windowToOverlay = "", bool fpscounter = true) {
             _type = type;
             _windowToOverlay = windowToOverlay;
 
@@ -112,7 +112,9 @@ namespace Eternal.Forms {
             _tpFoset = _rest += tpf - _tpfInt;
 
             InitializeComponent();
-            _drawSource = new DrawSource( drawAction ?? throw new ArgumentNullException( nameof( drawAction ) ) );
+            _drawSource = new DrawSource();
+
+            _drawSource.DrawAction += DrawSourceOnDrawAction;
 
             Controls.Add( _drawSource );
 
@@ -120,6 +122,13 @@ namespace Eternal.Forms {
             var fpsThread = new Thread( FpsUpdater );
             fpsThread.Start();
         }
+
+        private void DrawSourceOnDrawAction(Graphics arg1, int arg2) {
+            DrawUpdate?.Invoke( arg1, arg2 );
+        }
+
+        public event Action<Graphics, int> DrawUpdate;
+
 
         // ReSharper disable once InconsistentNaming
         private void ILoad(object sender, EventArgs e) {
@@ -156,6 +165,8 @@ namespace Eternal.Forms {
                 bonus += 1;
             _rest -= bonus;
             _updater.Interval = _tpfInt + bonus;
+            if(bonus>0)
+                Console.WriteLine( bonus );
 
             if (_type == WindowType.OverlaySingleWindow)
                 Overlay();
@@ -225,9 +236,7 @@ namespace Eternal.Forms {
     }
 
     public sealed class DrawSource : Panel {
-        public DrawSource(Action<Graphics, int> drawAction) {
-            DrawAction = drawAction;
-
+        public DrawSource() {
             DoubleBuffered = true;
             Dock = DockStyle.Fill;
             Location = new Point( 0, 0 );
@@ -242,10 +251,10 @@ namespace Eternal.Forms {
             G.Clear( BackColor );
             Frame += 1;
 
-            DrawAction( G, Frame );
+            DrawAction?.Invoke( G, Frame );
         }
 
-        private Action<Graphics, int> DrawAction { get; }
+        public event Action<Graphics, int> DrawAction;
 
         private int Frame { get; set; }
 

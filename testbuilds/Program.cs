@@ -17,7 +17,7 @@ using testbuilds.TestUtils;
 namespace testbuilds {
     class Program {
         public static void Main(string[] args) {
-            new EternalFramework.EternalMain( 1 );
+            //new EternalFramework.EternalMain( 1 );
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault( true );
 
@@ -369,18 +369,45 @@ namespace testbuilds {
                     name = Console.ReadLine();
                     break;
             }
-            var graphicsForm = new GraphicsForm( 20, DrawAction, type, name );
+            var graphicsForm = new GraphicsForm( 40, type, name );
+            graphicsForm.DrawUpdate += DrawAction;
             Application.Run( graphicsForm );
         }
 
         private static void DrawAction(Graphics g, int frame) {
-            const int max = 100;
-            const int scale = 8;
-            var k = frame % max;
+            const int max = 255;
+            const int scale = 3;
+
+            state = ( ( frame * 3 ) % ( max * 3 ) ) / max;
+
+            var k = ( Math.Cos( (double) frame / 16 ) + 1 ) * max / 2;
             for (var i = 0; i < max; i++) {
                 for (var j = 0; j < max; j++) {
-                    g.FillRectangle( new SolidBrush( Color.FromArgb( 255, i, j, k ) ), new Rectangle( i * scale, j * scale, scale, scale ) );
+                    g.FillRectangle( new SolidBrush( getcolor( i, j, (int) k, frame ) ), new Rectangle( i * scale, j * scale, scale, scale ) );
                 }
+            }
+            FontFamily fontFamily = new FontFamily( "Arial" );
+            Font font = new Font(
+                fontFamily,
+                30,
+                FontStyle.Regular,
+                GraphicsUnit.Pixel );
+
+            //g.DrawString( "hallo welt", font, new SolidBrush( getcolor( 200, 100, 200, frame ) ), new PointF( 10, 10 ) );
+        }
+
+        private static int state = 0;
+        private static Color getcolor(int i, int j, int k, int frame) {
+
+            switch (state) {
+                case 0:
+                    return Color.FromArgb( 255, i, j, k );
+                case 1:
+                    return Color.FromArgb( 255, j, k, i );
+                case 2:
+                    return Color.FromArgb( 255, k, i, j );
+                default:
+                    return Color.FromArgb( 255, i, j, k );
             }
         }
 
