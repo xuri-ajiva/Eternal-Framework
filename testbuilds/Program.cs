@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -32,17 +33,17 @@ namespace testbuilds {
         }
 
         private Program() {
-            var exit = new ChoisObjekts( "Exit(0)", _Exit );
-            var ftp = new ChoisObjekts( "FtpTest", _Ftp );
-            var ims = new ChoisObjekts( "ImageScanTest", _ImageScan );
-            var ai = new ChoisObjekts( "AiTest", _Ai );
-            var task = new ChoisObjekts( "Testtest With Ftp", _Task );
-            var taskingo = new ChoisObjekts( "TaskInfoTests", _TaskInfo );
+            var exit        = new ChoisObjekts( "Exit(0)",           _Exit );
+            var ftp         = new ChoisObjekts( "FtpTest",           _Ftp );
+            var ims         = new ChoisObjekts( "ImageScanTest",     _ImageScan );
+            var ai          = new ChoisObjekts( "AiTest",            _Ai );
+            var task        = new ChoisObjekts( "Testtest With Ftp", _Task );
+            var taskingo    = new ChoisObjekts( "TaskInfoTests",     _TaskInfo );
             var gravigsform = new ChoisObjekts( "GraficsForm tests", _GraphicsForm );
+            var ServerTests = new ChoisObjekts( "Server tests",      _ServerTests );
 
-            while (true) {
-
-                Utils.SetupChoise( new[] { exit, ftp, task, taskingo, ai, ims, gravigsform } );
+            while ( true ) {
+                Utils.SetupChoise( new[] { exit, ftp, task, taskingo, ai, ims, gravigsform, ServerTests } );
                 Console.WriteLine( "\n" );
                 Thread.Sleep( 1000 );
                 Console.ReadKey();
@@ -50,23 +51,26 @@ namespace testbuilds {
             }
         }
 
+
         private void _Exit() {
             Console.WriteLine( "\nPress Any Key To Exit..." );
             var p = ParentProcessUtilities.GetParentProcess();
-            if (p.ProcessName.ToLower() != "cmd")
-                Console.ReadKey();
+            if ( p.ProcessName.ToLower() != "cmd" ) Console.ReadKey();
             Environment.Exit( 0 );
         }
 
-        #region TaskTrack
+    #region TaskTrack
+
         private TaskInfo _ti;
-        TaskInfo.State _state = TaskInfo.State.None;
+        TaskInfo.State   _state = TaskInfo.State.None;
+
         public void _TaskInfo() {
             _ti = new TaskInfo( "testtask", Tasktest );
             _ti.Run();
         }
+
         public void Tasktest() {
-            while (true) {
+            while ( true ) {
                 _ti._State = TaskInfo.State.critical;
                 Thread.Sleep( 1000 );
 
@@ -89,27 +93,31 @@ namespace testbuilds {
                 Thread.Sleep( 2000 );
             }
         }
+
         private void _Task() {
             _ti = new TaskInfo( " ", _Ftp );
             _ti.Run();
         }
-        #endregion
 
-        #region FtpTest
+    #endregion
+
+    #region FtpTest
+
         private FtpClinet _ftp;
+
         private void _Ftp() {
             const string filename = "Roaming.rar";
             _state = TaskInfo.State.running;
-            var passwd = Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) );
-            Thread up = new Thread( () => { } );
+            var    passwd = Convert.ToBase64String( Encoding.UTF8.GetBytes( "test" ) );
+            Thread up     = new Thread( () => { } );
             try {
                 _ftp = new FtpClinet( "ftp://127.0.0.1/" + filename, "test", passwd, filename, (int) Math.Pow( 2, 26 ) );
                 Console.Write( "\n  " );
                 up = new Thread( () => {
-                    while (true)
-                        if (_ti != null) {
+                    while ( true )
+                        if ( _ti != null ) {
                             _ti._State = _state;
-                            _ti._Name = _ftp.Message;
+                            _ti._Name  = _ftp.Message;
                         }
                         else {
                             Console.SetCursorPosition( 0, Console.CursorTop );
@@ -121,92 +129,99 @@ namespace testbuilds {
                 Thread.Sleep( 10 );
                 up.Abort();
                 _state = TaskInfo.State.ok;
-
-            }
-            catch (System.Net.WebException) {
+            } catch (System.Net.WebException) {
                 _state = TaskInfo.State.warning;
-            }
-            catch (IOException) {
+            } catch (IOException) {
                 _state = TaskInfo.State.critical;
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 _state = TaskInfo.State.fail;
             }
+
             up.Abort();
         }
-        #endregion
 
-        #region AiTests
+    #endregion
 
-        private ModuleBase _module;
-        private AiMasterBase _aiMaster;
-        private readonly dynamic[] _lo = new dynamic[4];
+    #region AiTests
+
+        private          ModuleBase   _module;
+        private          AiMasterBase _aiMaster;
+        private readonly dynamic[]    _lo = new dynamic[4];
+
         private readonly RandomGenerator _r = new RandomGenerator();
         //private readonly Random _r = new Random();
 
-        private void SetAlgorythmos(double l1, double l2, double l3, double l4/*, double l5*/) {
-            _lo[0] = R( l1 ); _lo[1] = R( l2 ); _lo[2] = R( l3 ); _lo[3] = R( l4 );/* _lo[4] = r( l5 );*/
+        private void SetAlgorythmos(double l1, double l2, double l3, double l4 /*, double l5*/) {
+            _lo[0] = R( l1 );
+            _lo[1] = R( l2 );
+            _lo[2] = R( l3 );
+            _lo[3] = R( l4 ); /* _lo[4] = r( l5 );*/
         }
+
         private void SetAlgorythmos(ModuleBase @base) {
-            SetAlgorythmos( @base.ToChange[0], @base.ToChange[1], @base.ToChange[2], @base.ToChange[3]/*, @base.ToChange[4] */);
+            SetAlgorythmos( @base.ToChange[0], @base.ToChange[1], @base.ToChange[2], @base.ToChange[3] /*, @base.ToChange[4] */ );
         }
 
         private int _startmoney;
-        private void SlotAutomatAlgo(ModuleBase m, bool ausgabe) {
-            double bank = 10000;
-            double cash = _startmoney;
-            var i = 0;
-            var array = m.ToChange;
 
-            while (cash >= 0 && bank > 0) {
+        private void SlotAutomatAlgo(ModuleBase m, bool ausgabe) {
+            double bank  = 10000;
+            double cash  = _startmoney;
+            var    i     = 0;
+            var    array = m.ToChange;
+
+            while ( cash >= 0 && bank > 0 ) {
                 var g = _r.Next( 0, 100 );
 
                 cash -= 2;
                 bank += 2;
 
-                if (g > 99) {
+                if ( g > 99 ) {
                     bank -= array[0];
                     cash += array[0];
                 }
-                else if (g > 90) {
+                else if ( g > 90 ) {
                     bank -= array[1];
                     cash += array[1];
                 }
-                else if (g > 80) {
+                else if ( g > 80 ) {
                     bank -= array[2];
                     cash += array[2];
                 }
-                else if (g > 70) {
+                else if ( g > 70 ) {
                     bank -= array[3];
                     cash += array[3];
-                }/*
+                } /*
                 else if (g > 65) {
                     bank -= array[4];
                     cash += array[4];
                 }*/
 
-                for (var j = 0; j < array.Length; j++) {
+                for ( var j = 0; j < array.Length; j++ ) {
                     array[j] = R( array[j] );
                 }
 
                 i += 1;
             }
-            if (ausgabe) {
+
+            if ( ausgabe ) {
                 cash = R( cash );
                 bank = R( bank );
                 Console.WriteLine( $"[{i}]: cach:{cash}, bank:{bank}" );
             }
+
             m.Variable = i;
         }
 
         private double R(double d) {
-            var m = (decimal) d; return (double) ( Math.Truncate( m * 1000m ) / 1000m );
+            var m = (decimal) d;
+            return (double) ( Math.Truncate( m * 1000m ) / 1000m );
         }
 
         private void _Ai() {
-            const bool showOutput = false;
-            const double vMin = 0.01D;
-            const double vMax = 0.02D;
+            const bool   showOutput = false;
+            const double vMin       = 0.01D;
+            const double vMax       = 0.02D;
 
             Console.Write( "Bitte startgeld Für Kunden Angeben:" );
             int.TryParse( Console.ReadLine(), out _startmoney );
@@ -222,7 +237,7 @@ namespace testbuilds {
             Console.WriteLine( "-----------------SETUP----------------" );
             var t = DateTime.Now;
             SetAlgorythmos( 20, 11, 6, 4 );
-            _module = new ModuleBase( 0, thaget, vMin, vMax, _lo, SlotAutomatAlgo, tolleranz );
+            _module   = new ModuleBase( 0, thaget, vMin, vMax, _lo, SlotAutomatAlgo, tolleranz );
             _aiMaster = new AiMasterBase( _module );
             Console.WriteLine( _module.GetId );
             Console.WriteLine( "done in " + ( DateTime.Now - t ) );
@@ -239,7 +254,7 @@ namespace testbuilds {
             Console.ReadKey();
             Console.Clear();
 
-            for (var i = 1; i < loops + 1; i++) {
+            for ( var i = 1; i < loops + 1; i++ ) {
                 Console.SetCursorPosition( 0, 0 );
                 Console.WriteLine( "---------------TRAINING---------------" );
                 t = DateTime.Now;
@@ -252,16 +267,13 @@ namespace testbuilds {
             }
 
             var maxFinalVaule = 0D;
-            var maxRound = 0D;
-            var maxTs = TimeSpan.MaxValue;
+            var maxRound      = 0D;
+            var maxTs         = TimeSpan.MaxValue;
 
-            foreach (var stat in _aiMaster.Stats) {
-                if (maxFinalVaule < stat.Finalvaule)
-                    maxFinalVaule = stat.Finalvaule;
-                if (maxRound < stat.Round1)
-                    maxRound = stat.Round1;
-                if (maxTs < stat.Time1)
-                    maxTs = stat.Time1;
+            foreach ( var stat in _aiMaster.Stats ) {
+                if ( maxFinalVaule < stat.Finalvaule ) maxFinalVaule = stat.Finalvaule;
+                if ( maxRound      < stat.Round1 ) maxRound          = stat.Round1;
+                if ( maxTs         < stat.Time1 ) maxTs              = stat.Time1;
             }
 
             Console.SetCursorPosition( 0, Console.CursorTop + 3 );
@@ -272,12 +284,11 @@ namespace testbuilds {
             Console.ReadKey();
             t = DateTime.Now;
 
-
             SetAlgorythmos( _module );
             _module = new ModuleBase( 0, thaget, vMin, vMax, _lo, SlotAutomatAlgo, tolleranz );
 
             double max = 0;
-            for (var i = 0; i < 100; i++) {
+            for ( var i = 0; i < 100; i++ ) {
                 SlotAutomatAlgo( _module, true );
                 max = _module.Variable > max ? _module.Variable : max;
             }
@@ -287,42 +298,41 @@ namespace testbuilds {
         }
 
         private void ProgressBar(int i, int max) {
-
-            var rundenanzeige = $"[{ i}/{ max}]";
-            var v = Console.WindowWidth - 3;
+            var rundenanzeige = $"[{i}/{max}]";
+            var v             = Console.WindowWidth - 3;
             Console.SetCursorPosition( 1, Console.CursorTop );
-            for (var j = 0; j < ( i / (double) max ) * v; j++) {
+            for ( var j = 0; j < ( i / (double) max ) * v; j++ ) {
                 Console.Write( "=" );
             }
+
             Console.Write( ">" );
-            for (var j = i; j < ( v - ( i / (double) max ) * v ) - 1; j++) {
+            for ( var j = i; j < ( v - ( i / (double) max ) * v ) - 1; j++ ) {
                 Console.Write( " " );
             }
 
-            try { Console.SetCursorPosition( 0, Console.CursorTop ); }
-            catch {
+            try { Console.SetCursorPosition( 0, Console.CursorTop ); } catch {
                 // ignored
             }
 
             Console.Write( "[" );
-            try { Console.SetCursorPosition( v + 1, Console.CursorTop ); }
-            catch {
+            try { Console.SetCursorPosition( v + 1, Console.CursorTop ); } catch {
                 // ignored
             }
 
             Console.Write( "]" );
-            try { Console.SetCursorPosition( ( v + 1 ) - rundenanzeige.Length, Console.CursorTop - 1 ); }
-            catch {
+            try { Console.SetCursorPosition( ( v + 1 ) - rundenanzeige.Length, Console.CursorTop - 1 ); } catch {
                 // ignored
             }
 
             Console.Write( rundenanzeige );
         }
-        #endregion
 
-        #region ImageScanTest
+    #endregion
+
+    #region ImageScanTest
 
         ImageSearch _mainimageseatch = new ImageSearch();
+
         private void _ImageScan() {
             const string pathToBmp = "..\\..\\..\\example.png";
 
@@ -333,26 +343,28 @@ namespace testbuilds {
 
             Process.Start( pathToBmp );
 
-            while (true) {
-
+            while ( true ) {
                 imageSearch.SeatchIn( _mainimageseatch.CaptureScreen() );
                 Console.WriteLine( imageSearch.Result );
                 imageSearch.Clean();
                 Thread.Sleep( 250 );
             }
         }
-        #endregion
 
-        #region GraphicsForm
+    #endregion
+
+    #region GraphicsForm
 
         private static void _GraphicsForm() {
-
-            Console.WriteLine( "Bitte wählen:\n[0]" + GraphicsForm.WindowType.Form + "\n[1]" + GraphicsForm.WindowType.Fullscreen + "\n[2]" + GraphicsForm.WindowType.OverlaySingleWindow );
+            Console.WriteLine( "Bitte wählen:\n[0]"               +
+                               GraphicsForm.WindowType.Form       +
+                               "\n[1]"                            +
+                               GraphicsForm.WindowType.Fullscreen +
+                               "\n[2]"                            +
+                               GraphicsForm.WindowType.OverlaySingleWindow );
             // ReSharper disable once RedundantAssignment
             var chois = -1;
-            while (!int.TryParse( Console.ReadLine(), out chois ) && chois <= 3 && chois >= 0) {
-
-            }
+            while ( !int.TryParse( Console.ReadLine(), out chois ) && chois <= 3 && chois >= 0 ) { }
 
             var name = "";
             var type = GraphicsForm.WindowType.Form;
@@ -369,48 +381,74 @@ namespace testbuilds {
                     name = Console.ReadLine();
                     break;
             }
+
             var graphicsForm = new GraphicsForm( 40, type, name );
             graphicsForm.DrawUpdate += DrawAction;
             Application.Run( graphicsForm );
         }
 
         private static void DrawAction(Graphics g, int frame) {
-            const int max = 255;
+            const int max   = 255;
             const int scale = 3;
 
             state = ( ( frame * 3 ) % ( max * 3 ) ) / max;
 
             var k = ( Math.Cos( (double) frame / 16 ) + 1 ) * max / 2;
-            for (var i = 0; i < max; i++) {
-                for (var j = 0; j < max; j++) {
+            for ( var i = 0; i < max; i++ ) {
+                for ( var j = 0; j < max; j++ ) {
                     g.FillRectangle( new SolidBrush( getcolor( i, j, (int) k, frame ) ), new Rectangle( i * scale, j * scale, scale, scale ) );
                 }
             }
+
             FontFamily fontFamily = new FontFamily( "Arial" );
-            Font font = new Font(
-                fontFamily,
-                30,
-                FontStyle.Regular,
-                GraphicsUnit.Pixel );
+            Font       font       = new Font( fontFamily, 30, FontStyle.Regular, GraphicsUnit.Pixel );
 
             //g.DrawString( "hallo welt", font, new SolidBrush( getcolor( 200, 100, 200, frame ) ), new PointF( 10, 10 ) );
         }
 
         private static int state = 0;
-        private static Color getcolor(int i, int j, int k, int frame) {
 
+        private static Color getcolor(int i, int j, int k, int frame) {
             switch (state) {
-                case 0:
-                    return Color.FromArgb( 255, i, j, k );
-                case 1:
-                    return Color.FromArgb( 255, j, k, i );
-                case 2:
-                    return Color.FromArgb( 255, k, i, j );
-                default:
-                    return Color.FromArgb( 255, i, j, k );
+                case 0:  return Color.FromArgb( 255, i, j, k );
+                case 1:  return Color.FromArgb( 255, j, k, i );
+                case 2:  return Color.FromArgb( 255, k, i, j );
+                default: return Color.FromArgb( 255, i, j, k );
             }
         }
 
-        #endregion
+    #endregion
+
+    #region ServerTests
+
+        private void _ServerTests() {
+            var t = new Thread( () => {
+                var serv = new Eternal.Net.SocketBase( (int) Math.Pow( 2, 10 ), 444, IPAddress.Any, true );
+                serv.OnMessageReceived += serverreceived;
+                serv.Server();
+            } );
+            var t2 = new Thread( () => {
+                var sock = new Eternal.Net.SocketBase( (int) Math.Pow( 2, 10 ), 444, IPAddress.Parse( "127.0.0.1" ), false );
+                sock.OnMessageReceived += clientreseve;
+                sock.Connect();
+            } );
+
+            t.Start();
+
+            t2.Start();
+
+        }
+
+        private void serverreceived(SocketContext obj) {
+            Console.WriteLine( $"[{obj.PSender}]"+obj.PMessage );
+            obj.Send( obj, "from server" );
+        }
+
+        private void clientreseve(SocketContext obj) {
+            obj.Send( obj, "from client" );
+            Thread.Sleep( 100 );
+        }
+
+    #endregion
     }
 }
