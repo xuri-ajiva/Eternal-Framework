@@ -22,6 +22,20 @@ namespace overlaytests {
 
         public Overlay() {
             InitializeComponent();
+
+            var b = new Button() {
+                Text = "exit",
+                Location = new Point(0,0),
+                Size = new Size(50,50),
+                BackColor =Color.AliceBlue,
+            };
+            b.Click += exit;
+            Controls.Add( b );
+            b.BringToFront();
+        }
+
+        private void exit(object sender, EventArgs e) {
+            Environment.Exit( 0 );
         }
 
         public void IUpdate(object sender, EventArgs e) {
@@ -36,7 +50,7 @@ namespace overlaytests {
         private void ILoad(object sender, EventArgs e) {
             var r = new Random();
 
-            BackColor = Color.DeepPink;
+            BackColor = Color.FromArgb( 255, 1, 1, 1 );
             TransparencyKey = BackColor;
             TopMost = true;
             FormBorderStyle = FormBorderStyle.None;
@@ -72,6 +86,8 @@ namespace overlaytests {
                 g.Clear( BackColor );
 
                 for (var i = 0; i < Program.rectangles.Count; i++) {
+                    if(i >= Program.rectangles.Count)
+                        break;
                     var r = Program.rectangles[i];
 
                     var p = new Pen( r._color, r._size );
