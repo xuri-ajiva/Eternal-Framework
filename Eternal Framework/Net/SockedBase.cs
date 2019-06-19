@@ -176,7 +176,7 @@ namespace Eternal.Net {
         public string PReceiver  { get; private set; }
         public string PLocalName { get; private set; }
         public string PMessage   { get; private set; }
-        public Socket PSocket    { get; private set; }
+        public Socket PSocket    { get; internal set; }
 
         public bool ForceName(string name) {
             if ( name.Length != 9 ) return false;
