@@ -24,7 +24,7 @@ namespace Eternal.Net {
         public void Upload() {
             Upload( FtpAddres, Name, Base64Password, File, BufferLength );
         }
-        public void Upload(string ftpAddres, string name, string base64Password, string file, int bufferLength) {
+        public static void Upload(string ftpAddres, string name, string base64Password, string file, int bufferLength) {
             Message = "Uploadeding... ";
             var dt = DateTime.Now;
             var request =
@@ -48,9 +48,9 @@ namespace Eternal.Net {
         public void Download() {
             Download( FtpAddres, Name, Base64Password, File, BufferLength );
         }
-        public void Download(string ftpAddres, string name, string base64Password, string file, int bufferLength) {
+        public static void Download(string ftpAddres, string name, string base64Password, string file, int bufferLength) {
             var currentpos = Console.CursorLeft;
-            Console.Write( "Downloaded " );
+            Message = ( "Downloaded " );
             var dt = DateTime.Now;
             var request =
     (FtpWebRequest) WebRequest.Create( ftpAddres );
@@ -63,13 +63,11 @@ namespace Eternal.Net {
                 int read;
                 while (ftpStream != null && ( read = ftpStream.Read( buffer, 0, buffer.Length ) ) > 0) {
                     fileStream.Write( buffer, 0, read );
-                    Console.SetCursorPosition( currentpos + 11, Console.CursorTop );
-                    Console.Write( "                                " );
-                    Console.SetCursorPosition( currentpos + 11, Console.CursorTop );
-                    Console.Write( "{0} bytes", fileStream.Position );
+                    
+                    Message = "Downloaded " + fileStream.Position + " bytes";
                 }
             }
-            Console.WriteLine( "\nFinished in {0}!", ( DateTime.Now - dt ) );
+           Message =  "Finished in " + ( DateTime.Now - dt ) ) +"!";
         }
     }
 }
