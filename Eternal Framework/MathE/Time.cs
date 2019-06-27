@@ -132,7 +132,11 @@ namespace Eternal.MathE {
 
                 MicroTimerEventArgs microTimerEventArgs =
                     new MicroTimerEventArgs( timerCount, elapsedMicroseconds, timerLateBy, callbackFunctionExecutionTime );
-                this.MicroTimerElapsed( this, microTimerEventArgs );
+                try {
+                    this.MicroTimerElapsed( this, microTimerEventArgs );
+                } catch {
+                    //
+                }
             }
 
             microStopwatch.Stop();
