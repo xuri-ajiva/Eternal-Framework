@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using Eternal.MathE;
 
 namespace Eternal.Forms {
     partial class GraphicsForm {
@@ -11,43 +13,42 @@ namespace Eternal.Forms {
 
         protected override void Dispose(bool disposing) {
             // ReSharper disable once UseNullPropagation
-            if (disposing && ( components != null )) {
-                components.Dispose();
+            if ( disposing && ( this.components != null ) ) {
+                this.components.Dispose();
             }
+
             base.Dispose( disposing );
         }
 
         private void InitializeComponent() {
-            components = new Container();
-            // ReSharper disable once RedundantNameQualifier
-            _updater = new System.Windows.Forms.Timer( components );
+            this.components = new Container();
+            this._updater   = new System.Windows.Forms.Timer( this.components );
             SuspendLayout();
             // 
-            // Updater
+            // _updater
             // 
-            _updater.Interval = 1;
-            _updater.Tick += IUpdate;
+            this._updater.Interval = 1;
             // 
             // GraphicsForm
             // 
-            AutoScaleDimensions = new SizeF( 8F, 16F );
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size( 500, 500 );
-            Name = "GraphicsForm";
-            Text = "Form";
-            Load += ILoad;
-            Closing += IClosing;
+            AutoScaleDimensions =  new SizeF( 6F, 13F );
+            AutoScaleMode       =  AutoScaleMode.Font;
+            ClientSize          =  new Size( 100, 100 );
+            Margin              =  new Padding( 2, 2, 2, 2 );
+            Name                =  "GraphicsForm";
+            Text                =  "Form";
+            Load                += ILoad;
+            Closing             += IClosing;
+
             ResumeLayout( false );
-
         }
 
-        private void IClosing(object sender, CancelEventArgs e) {
-            Environment.Exit( 0 );
-        }
+        private void IClosing(object sender, CancelEventArgs e) { Environment.Exit( 0 ); }
 
         // ReSharper disable once RedundantNameQualifier
         private System.Windows.Forms.Timer _updater;
     }
+
     public partial class GraphicsForm : Form {
         public enum WindowType {
             Form,
@@ -55,13 +56,14 @@ namespace Eternal.Forms {
             OverlaySingleWindow
         }
 
-        [DllImport( "user32.dll", SetLastError = true )]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-        [DllImport( "user32.dll", SetLastError = true )]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        [DllImport( "user32.dll", SetLastError = true )] private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        [DllImport( "user32.dll", SetLastError = true )] private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
         [DllImport( "user32.dll", SetLastError = true )]
         // ReSharper disable once UnusedMember.Local
-        private static extern IntPtr FindWindow(string ipClassName, string ipWindowName);[DllImport( "user32.dll" )]
+        private static extern IntPtr FindWindow(string ipClassName, string ipWindowName);
+
+        [DllImport( "user32.dll" )]
         [return: MarshalAs( UnmanagedType.Bool )]
         static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
@@ -75,183 +77,186 @@ namespace Eternal.Forms {
         }
 
         private readonly WindowType _type;
-        private readonly int _tpfInt;
-        private readonly float _tpFoset;
-        private readonly string _windowToOverlay;
+        private readonly string     _windowToOverlay;
 
-        private RECT _rect;
+        private RECT      _rect;
         private Rectangle _rectangle;
-        private IntPtr _hWnd = IntPtr.Zero;
+        private IntPtr    _hWnd = IntPtr.Zero;
+
+        private readonly Color _transparentColor;
+        private readonly bool  _frequentUpdate;
 
         private readonly DrawSource _drawSource;
+        private          MicroTimer microTimer;
 
-        private int _fps;
-        private void FpsUpdater() {
-            while (true) {
-                Thread.Sleep( 1000 );
-                if (_type == WindowType.OverlaySingleWindow) return;
-                try {
+        public GraphicsForm(WindowType type, Color transparentColor, string windowToOverlay = "", bool frequentUpdate = false, int maxFps = 10) {
+            this._type             = type;
+            this._transparentColor = transparentColor;
+            this._windowToOverlay  = windowToOverlay;
+            this._frequentUpdate   = frequentUpdate;
 
-                    MethodInvoker del = delegate { Text = $"FPS:{_fps}"; };
-                    Invoke( del );
-                }
-                catch { //ig
-                }
-
-                _fps = 0;
-            }
-        }
-
-        public GraphicsForm(int maxFps, WindowType type, string windowToOverlay = "", bool fpscounter = true) {
-            _type = type;
-            _windowToOverlay = windowToOverlay;
-
-            var maxFps1 = maxFps;
-            var tpf = ( (float) 1000 / maxFps1 );
-            _tpfInt = Math.DivRem( 1000, maxFps1, out _ );
-            _tpFoset = _rest += tpf - _tpfInt;
+            var tpf = ( (long) MicroStopwatch.µs / maxFps );
 
             InitializeComponent();
-            _drawSource = new DrawSource();
+            this._drawSource = new DrawSource();
 
-            _drawSource.DrawAction += DrawSourceOnDrawAction;
+            this._drawSource.DrawAction += DrawSourceOnDrawAction;
 
-            Controls.Add( _drawSource );
+            Controls.Add( this._drawSource );
 
-            if (!fpscounter) return;
-            var fpsThread = new Thread( FpsUpdater );
-            fpsThread.Start();
+            this.microTimer                   =  new MicroTimer();
+            this.microTimer.MicroTimerElapsed += new MicroTimer.MicroTimerElapsedEventHandler( IUpdate );
+
+            this.microTimer.Interval = tpf;
         }
 
-        private void DrawSourceOnDrawAction(Graphics arg1, int arg2) {
-            DrawUpdate?.Invoke( arg1, arg2 );
+        private void DrawSourceOnDrawAction(Graphics g, int f) {
+            var i = new DrawInfo( this._transparentColor, g, f );
+
+            this.DrawUpdate?.Invoke( i );
         }
 
-        public event Action<Graphics, int> DrawUpdate;
+        public event Func<DrawInfo, DrawInfo> DrawUpdate;
 
+
+        public void FireUpdate() { this._drawSource.Invoke( new Action( () => this._drawSource.Refresh() ) ); }
 
         // ReSharper disable once InconsistentNaming
         private void ILoad(object sender, EventArgs e) {
-
-            BackColor = Color.FromArgb( 220, 126, 204 );
+            BackColor       = this._transparentColor;
             TransparencyKey = BackColor;
-            DoubleBuffered = true;
+            DoubleBuffered  = true;
 
-            if (_type != WindowType.Form) {
-                ShowInTaskbar = false;
+            if ( this._type != WindowType.Form ) {
+                ShowInTaskbar   = false;
                 FormBorderStyle = FormBorderStyle.None;
-                TopMost = true;
+                TopMost         = true;
 
                 var initialStyle = GetWindowLong( Handle, -20 );
                 SetWindowLong( Handle, -20, initialStyle | 0x80000 | 0x20 );
 
                 Location = new Point( 0, 0 );
-                Size = Screen.PrimaryScreen.Bounds.Size;
+                Size     = Screen.PrimaryScreen.Bounds.Size;
+            }
+            else {
+                this._drawSource.MouseMove += new MouseEventHandler( FormMouseMove );
+                this._drawSource.MouseDown += new MouseEventHandler( FormMouseDown );
+
+                ShowInTaskbar   = true;
+                FormBorderStyle = FormBorderStyle.Sizable;
+                TopMost         = false;
             }
 
-            if (_type == WindowType.OverlaySingleWindow && _windowToOverlay != "") {
+            if ( this._type == WindowType.OverlaySingleWindow && this._windowToOverlay != "" ) {
                 set_hWnd();
             }
 
-            _updater.Start();
+            // this._updater.Start();
+            this.microTimer.Enabled = true; // Start timer
         }
 
-        private float _rest;
         // ReSharper disable once InconsistentNaming
         private void IUpdate(object sender, EventArgs e) {
-            _rest += _tpFoset;
-            var bonus = 0;
-            if (_rest >= 1)
-                bonus += 1;
-            _rest -= bonus;
-            _updater.Interval = _tpfInt + bonus;
-            if(bonus>0)
-                Console.WriteLine( bonus );
+            if ( this._type == WindowType.OverlaySingleWindow ) Overlay();
 
-            if (_type == WindowType.OverlaySingleWindow)
-                Overlay();
-
-            _fps++;
-            _drawSource.Refresh();
+            if ( this._frequentUpdate ) FireUpdate();
         }
 
         private bool set_hWnd() {
-            if (_windowToOverlay == "") return false;
+            if ( this._windowToOverlay == "" ) return false;
             try {
-                _hWnd = FindWindow( null, _windowToOverlay );
-                if (_hWnd != IntPtr.Zero) return true;
+                this._hWnd = FindWindow( null, this._windowToOverlay );
+                if ( this._hWnd != IntPtr.Zero ) return true;
 
                 Console.WriteLine( "Window Not Found!" );
                 Application.Exit();
-            }
-            catch {
+            } catch {
                 //  
             }
+
             return false;
         }
 
         private void Overlay() {
+            if ( this._hWnd == IntPtr.Zero )
+                if ( !set_hWnd() )
+                    return;
+            GetWindowRect( this._hWnd, out this._rect );
+            this._rectangle.X      = this._rect.Left;
+            this._rectangle.Y      = this._rect.Top;
+            this._rectangle.Width  = this._rect.Right  - this._rect.Left + 1;
+            this._rectangle.Height = this._rect.Bottom - this._rect.Top  + 1;
 
-            if (_hWnd == IntPtr.Zero) if (!set_hWnd()) return;
-
-            GetWindowRect( _hWnd, out _rect );
-            _rectangle.X = _rect.Left;
-            _rectangle.Y = _rect.Top;
-            _rectangle.Width = _rect.Right - _rect.Left + 1;
-            _rectangle.Height = _rect.Bottom - _rect.Top + 1;
-
-            Size = new Size( _rectangle.Width, _rectangle.Height );
-            Top = _rect.Top;
-            Left = _rect.Left;
+            Size = new Size( this._rectangle.Width, this._rectangle.Height );
+            Top  = this._rect.Top;
+            Left = this._rect.Left;
         }
 
-        #region public
+    #region Handler für das Verschieben der Form
 
-        public DrawSource DrawSource => _drawSource;
+        private Point _mousePosition;
 
-        public int Fps => _fps;
+        private void FormMouseDown(object sender, MouseEventArgs e) { this._mousePosition = new Point( -e.X, -e.Y ); }
 
-        public IntPtr HWnd => _hWnd;
+        private void FormMouseMove(object sender, MouseEventArgs e) {
+            // Wenn der Linke Button gedrückt ist
+            if ( e.Button == MouseButtons.Left ) {
+                // Maus-Position auf dem Control
+                Point mousePos = MousePosition;
 
-        public RECT Rect => _rect;
+                // Verschiebt den Punkt um den angegebenden Betrag
+                mousePos.Offset( this._mousePosition.X, this._mousePosition.Y );
 
-        public Rectangle Rectangle => _rectangle;
+                // Neue Position setzen
+                Location = mousePos;
+            }
+        }
 
-        public float Rest => _rest;
+    #endregion
 
-        public int TpfInt => _tpfInt;
+    #region public
 
-        public float TpFoset => _tpFoset;
+        public DrawSource DrawSource => this._drawSource;
 
-        public WindowType Type => _type;
+        public IntPtr HWnd => this._hWnd;
+
+        public RECT Rect => this._rect;
+
+        public Rectangle Rectangle => this._rectangle;
+
+        public WindowType Type => this._type;
 
         // ReSharper disable once RedundantNameQualifier
-        public System.Windows.Forms.Timer Updater => _updater;
+        public System.Windows.Forms.Timer Updater => this._updater;
 
-        public string WindowToOverlay => _windowToOverlay;
+        public string WindowToOverlay => this._windowToOverlay;
 
-        public IContainer Components => components;
+        public IContainer Components => this.components;
 
-        #endregion
+        public Size WindowSize { get => Size; set => Size = value; }
+
+    #endregion
     }
 
     public sealed class DrawSource : Panel {
+        [DebuggerStepThrough]
         public DrawSource() {
-            DoubleBuffered = true;
-            Dock = DockStyle.Fill;
-            Location = new Point( 0, 0 );
-            Name = "DrawSource";
-            TabIndex = 0;
-            Paint += IPaint;
+            DoubleBuffered =  true;
+            Dock           =  DockStyle.Fill;
+            Location       =  new Point( 0, 0 );
+            Name           =  "DrawSource";
+            TabIndex       =  0;
+            this.Paint     += IPaint;
         }
 
         // ReSharper disable once InconsistentNaming
+        [DebuggerStepThrough]
         private void IPaint(object sender, PaintEventArgs e) {
             G = e.Graphics;
             G.Clear( BackColor );
             Frame += 1;
 
-            DrawAction?.Invoke( G, Frame );
+            this.DrawAction?.Invoke( G, Frame );
         }
 
         public event Action<Graphics, int> DrawAction;
@@ -259,5 +264,34 @@ namespace Eternal.Forms {
         private int Frame { get; set; }
 
         private Graphics G { get; set; }
+    }
+
+    public class DrawInfo {
+        private Graphics _g;
+        private Color    _transparentColor;
+
+        private int _frame;
+
+        [DebuggerStepThrough]
+        public DrawInfo(Color transparentColor, Graphics g = null, int frame = 0) {
+            this._transparentColor = transparentColor;
+            this._g                = g;
+            this._frame            = frame;
+        }
+
+        public Graphics G {
+            [DebuggerStepThrough] get => this._g;
+            set => this._g = value;
+        }
+
+        public int Frame {
+            [DebuggerStepThrough] get => this._frame;
+            set => this._frame = value;
+        }
+
+        public Color TransparentColor {
+            [DebuggerStepThrough] get => this._transparentColor;
+            set => this._transparentColor = value;
+        }
     }
 }

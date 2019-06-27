@@ -56,12 +56,18 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MathE\Complex.cs" />
+    <Compile Include="MathE\Time.cs" />
     <Compile Include="Net\Ftp.cs" />
     <Compile Include="Net\SockedBase.cs" />
     <Compile Include="privatevar\privatestaff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Visualisation\TaskInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\GraphicsForm.resx">
+      <DependentUpon>GraphicsForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
