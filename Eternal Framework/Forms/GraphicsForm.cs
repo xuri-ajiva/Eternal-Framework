@@ -22,12 +22,7 @@ namespace Eternal.Forms {
 
         private void InitializeComponent() {
             this.components = new Container();
-            this._updater   = new System.Windows.Forms.Timer( this.components );
             SuspendLayout();
-            // 
-            // _updater
-            // 
-            this._updater.Interval = 1;
             // 
             // GraphicsForm
             // 
@@ -37,16 +32,14 @@ namespace Eternal.Forms {
             Margin              =  new Padding( 2, 2, 2, 2 );
             Name                =  "GraphicsForm";
             Text                =  "Form";
-            Load                += ILoad;
-            Closing             += IClosing;
+            this.Load                += ILoad;
+            this.Closing             += IClosing;
 
             ResumeLayout( false );
         }
 
         private void IClosing(object sender, CancelEventArgs e) { Environment.Exit( 0 ); }
-
-        // ReSharper disable once RedundantNameQualifier
-        private System.Windows.Forms.Timer _updater;
+        
     }
 
     public partial class GraphicsForm : Form {
@@ -168,8 +161,8 @@ namespace Eternal.Forms {
                 this._hWnd = FindWindow( null, this._windowToOverlay );
                 if ( this._hWnd != IntPtr.Zero ) return true;
 
-                Console.WriteLine( "Window Not Found!" );
-                Application.Exit();
+                this.microTimer.Enabled = false;
+                throw new Exception( "Window Not Found!" );
             } catch {
                 //  
             }
@@ -187,9 +180,9 @@ namespace Eternal.Forms {
             this._rectangle.Width  = this._rect.Right  - this._rect.Left + 1;
             this._rectangle.Height = this._rect.Bottom - this._rect.Top  + 1;
 
-            Size = new Size( this._rectangle.Width, this._rectangle.Height );
-            Top  = this._rect.Top;
-            Left = this._rect.Left;
+            Invoke( new Action( () => Size = new Size( this._rectangle.Width, this._rectangle.Height ) ) );
+            Invoke( new Action( () => Top  = this._rect.Top ) );
+            Invoke( new Action( () => Left = this._rect.Left ) );
         }
 
     #region Handler für das Verschieben der Form
@@ -225,9 +218,6 @@ namespace Eternal.Forms {
         public Rectangle Rectangle => this._rectangle;
 
         public WindowType Type => this._type;
-
-        // ReSharper disable once RedundantNameQualifier
-        public System.Windows.Forms.Timer Updater => this._updater;
 
         public string WindowToOverlay => this._windowToOverlay;
 
