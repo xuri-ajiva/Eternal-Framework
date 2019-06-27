@@ -8,6 +8,7 @@ using Eternal.Visualisation;
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -355,6 +356,8 @@ namespace testbuilds {
 
     #region GraphicsForm
 
+        public static GraphicsForm graphicsForm;
+
         private static void _GraphicsForm() {
             Console.WriteLine( "Bitte wählen:\n[0]"               +
                                GraphicsForm.WindowType.Form       +
@@ -382,28 +385,46 @@ namespace testbuilds {
                     break;
             }
 
-            var graphicsForm = new GraphicsForm( 40, type, name );
+            graphicsForm            =  new GraphicsForm( type, Color.White, name, true, 1 );
             graphicsForm.DrawUpdate += DrawAction;
+
             Application.Run( graphicsForm );
         }
 
-        private static void DrawAction(Graphics g, int frame) {
+        private static bool _isSize = false;
+
+        private static DrawInfo DrawAction(DrawInfo d) {
             const int max   = 255;
-            const int scale = 3;
+            const int scale = 4;
 
-            state = ( ( frame * 3 ) % ( max * 3 ) ) / max;
+            if ( !_isSize ) {
+                graphicsForm.Size = new Size( max * scale, max * scale );
+                _isSize           = true;
+            }
 
-            var k = ( Math.Cos( (double) frame / 16 ) + 1 ) * max / 2;
+            state = ( ( d.Frame * 3 ) % ( max * 3 ) ) / max;
+
+            var k = ( Math.Cos( (double) d.Frame / 16 ) + 1 ) * max / 2;
             for ( var i = 0; i < max; i++ ) {
                 for ( var j = 0; j < max; j++ ) {
-                    g.FillRectangle( new SolidBrush( getcolor( i, j, (int) k, frame ) ), new Rectangle( i * scale, j * scale, scale, scale ) );
+                    d.G.FillRectangle( new SolidBrush( getcolor( i, j, (int) k, d.Frame ) ), new Rectangle( i * scale, j * scale, scale, scale ) );
                 }
             }
 
-            FontFamily fontFamily = new FontFamily( "Arial" );
-            Font       font       = new Font( fontFamily, 30, FontStyle.Regular, GraphicsUnit.Pixel );
+            var fontFamily = new FontFamily( "Arial" );
+            var font       = new Font( fontFamily, 30, FontStyle.Regular, GraphicsUnit.Pixel );
 
-            //g.DrawString( "hallo welt", font, new SolidBrush( getcolor( 200, 100, 200, frame ) ), new PointF( 10, 10 ) );
+            RectangleF rectf = new RectangleF( 0, 0, 90, 50 );
+
+            d.G.SmoothingMode     = SmoothingMode.AntiAlias;
+            d.G.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            d.G.PixelOffsetMode   = PixelOffsetMode.HighQuality;
+            d.G.DrawString( "Frame: " + d.Frame, new Font( "Tahoma", 10 ), Brushes.Black, rectf );
+
+            d.G.Flush();
+
+            return d;
+            //
         }
 
         private static int state = 0;
@@ -436,11 +457,10 @@ namespace testbuilds {
             t.Start();
 
             t2.Start();
-
         }
 
         private void serverreceived(SocketContext obj) {
-            Console.WriteLine( $"[{obj.PSender}]"+obj.PMessage );
+            Console.WriteLine( $"[{obj.PSender}]" + obj.PMessage );
             obj.Send( obj, "from server" );
         }
 
