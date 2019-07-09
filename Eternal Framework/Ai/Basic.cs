@@ -1,12 +1,6 @@
 ﻿using Eternal.Ai.Modle;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Windows.Documents;
 
 namespace Eternal.Ai {
     internal class AiMasterInt64 : EternalFramework.EternalMain {
@@ -162,7 +156,7 @@ namespace Eternal.Ai {
         private readonly ModuleBase _curentBase;
         private DateTime _ts;
 
-        private List<stats> _stats = new List<stats>();
+        private List<Stats> _stats = new List<Stats>();
 
         public void Trainloop(bool output = true) {
             _ts = DateTime.Now;
@@ -182,7 +176,6 @@ namespace Eternal.Ai {
             var Thaget = @base.Thaget;
             var Tolleranz = @base.Tolleranz;
             try {
-
                 if (@base.NextTry == 0) {
                     if (@base.Addition) @base.NextTry = min;
                     else @base.NextTry = -min;
@@ -219,7 +212,7 @@ namespace Eternal.Ai {
                     }
 
                     if (output)
-                        Console.WriteLine($"Next:{@base.NextTry}, prew:{prev}, post:{Variable}, tolleranz:{Tolleranz}" );
+                        Console.WriteLine( $"Next:{@base.NextTry}, prew:{prev}, post:{Variable}, tolleranz:{Tolleranz}" );
                     @base.Round += 1;
                 }
                 if (@base.Round % 20 == 10) {
@@ -243,7 +236,7 @@ namespace Eternal.Ai {
                 Console.WriteLine( $"[{i}]: {@base.ToChange[i]}." );
             }
             Console.WriteLine( "      " );
-            var s = new stats( @base.Round, ts, @base.Variable );
+            var s = new Stats( @base.Round, ts, @base.Variable );
             _stats.Add( s );
         }
 
@@ -253,15 +246,15 @@ namespace Eternal.Ai {
 
         public ModuleBase CurentBase => _curentBase;
 
-        public List<stats> Stats => _stats;
+        public List<Stats> Stats => _stats;
     }
 
-    public class stats {
+    public class Stats {
         private int Round;
         private TimeSpan Time;
         private double finalvaule;
 
-        public stats(int round, TimeSpan time, double finalvaule) {
+        public Stats(int round, TimeSpan time, double finalvaule) {
             Round = round;
             Time = time;
             this.finalvaule = finalvaule;
@@ -356,7 +349,6 @@ namespace Eternal.Ai.Modle {
         public dynamic Thaget => _thaget;
     }
 
-
     internal class MInt64 : Base {
         public long W;
         public long Length { get; private set; }
@@ -432,6 +424,7 @@ namespace Eternal.Ai.Modle {
 
         public virtual void OnMainDouble(MDouble m, bool ausgabe = false) { }
     }
+
     internal class Base : EternalFramework.EternalMain {
         public bool init;
 
