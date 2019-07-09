@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace formstest {
@@ -41,6 +42,10 @@ namespace formstest {
 
         private void label1_Click(object sender, EventArgs e) {
 
+        }
+
+        private void progbar_Load(object sender, EventArgs e) {
+            label1.BackColor = Color.Transparent;
         }
     }
 }
