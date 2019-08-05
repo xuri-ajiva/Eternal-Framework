@@ -1,6 +1,9 @@
 ﻿using overlaytests;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace formstest {
@@ -10,9 +13,9 @@ namespace formstest {
         /// </summary>
         [STAThread]
         static void Main() {
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault( false );
-            Application.Run( new test() );
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault( false );
+            Application.Run( new Form2() );
         }
         public static Bitmap Calculate_Mandelbrot(int Whide, int Heigth) {
             var bmap = new Bitmap( Whide, Heigth );
