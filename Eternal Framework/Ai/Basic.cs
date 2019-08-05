@@ -271,7 +271,9 @@ namespace Eternal.Ai {
 namespace Eternal.Ai.Modle {
 
     public class ModuleBase : EternalFramework.EternalMain {
+#pragma warning disable 414
         private bool _init;
+#pragma warning restore 414
 
         private dynamic _variable;
         private readonly dynamic _thaget;

@@ -16,7 +16,7 @@ namespace Eternal.Net {
         private readonly int    session = 0;
         private readonly int    _buffersize;
         private          int    _bytesRcvd;
-        private          byte[] _rcvBuffer;
+        //private          byte[] _rcvBuffer;
         private          byte[] rcvBuffer;
 
         public SocketBase(int buffersize, int port, IPAddress ip, bool isServer = false, bool startinstadn = false) {
@@ -80,8 +80,7 @@ namespace Eternal.Net {
         private void ClientLoop() {
             try {
                 while ( ( this._bytesRcvd = MainSocked.PSocket.Receive( this.rcvBuffer, 0, this.rcvBuffer.Length, SocketFlags.None ) ) > 0 ) {
-                    string sender;
-                    var    context = MainSocked.ProgressReceive( this.rcvBuffer, this._bytesRcvd );
+                    var context = MainSocked.ProgressReceive( this.rcvBuffer, this._bytesRcvd );
 
                     this.OnMessageReceived?.Invoke( context );
 
@@ -136,8 +135,7 @@ namespace Eternal.Net {
 
                 context.Send( context, $"Name={context.PLocalName}" );
 
-                string sender;
-                //Console.WriteLine(ProgressResive(Encoding.Unicode.GetBytes(h), Encoding.Unicode.GetBytes(h).Length,out sender));
+                //Console.WriteLine(ProgressResive(Encoding.Unicode.GetBytes(h), Encoding.Unicode.GetBytes(h).Length,out var sender));
 
                 int pbytesRcvd;
                 while ( ( pbytesRcvd = context.PSocket.Receive( prcvBuffer, 0, prcvBuffer.Length, SocketFlags.None ) ) > 0 ) {

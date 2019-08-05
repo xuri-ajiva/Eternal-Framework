@@ -33,10 +33,12 @@ namespace formstest {
                 for (var j = -rangehHeigth; j < rangehHeigth / zom; j += 1 / zom) {
 
 
+/*
                     if (false) {
                         if (i <= Whide / 3 || i >= Whide - Whide / 3) continue;
                         if (j >= Heigth - Heigth / 2) continue;
                     }
+*/
 
                     //var a = ( i - ( (double) whide / 2 ) ) / ( (double) whide / 4 );
                     //var b = ( j - ( (double) heigth / 2 ) ) / ( (double) heigth / 4 );
