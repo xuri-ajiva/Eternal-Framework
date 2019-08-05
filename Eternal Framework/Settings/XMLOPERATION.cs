@@ -10,13 +10,24 @@ namespace Eternal.Settings {
     public class XMLOPERATION {
         public const string PathBase = ".\\DataSave\\";
 
-        public static void SAVE(object dataLayout, string path) {
+        public static void SAVE <T>(T dataLayout, string path) {
             System.IO.FileInfo file = new System.IO.FileInfo( path );
-            file.Directory.Create();
+            file.Directory?.Create();
 
             var        sr     = new XmlSerializer( dataLayout.GetType() );
             TextWriter writer = new StreamWriter( path );
             sr.Serialize( writer, dataLayout );
+            writer.Close();
+        }
+
+        public static void SAVE(object dataLayout, string path)
+        {
+            System.IO.FileInfo file = new System.IO.FileInfo(path);
+            file.Directory?.Create();
+
+            var        sr     = new XmlSerializer(dataLayout.GetType());
+            TextWriter writer = new StreamWriter(path);
+            sr.Serialize(writer, dataLayout);
             writer.Close();
         }
 
