@@ -32,7 +32,7 @@ namespace Eternal.Settings {
         }
 
         public static T LOAD <T>(string path) {
-            if ( !File.Exists( path ) ) throw new TypeAccessException();
+            if ( !File.Exists( path ) ) throw new IOException("Path dose not Exists");
 
             var xs = new XmlSerializer( typeof(T) );
             var fs = new FileStream( path, FileMode.Open, FileAccess.Read, FileShare.Read );
